@@ -1,52 +1,44 @@
-#ifndef __VEC3_H__
-#define __VEC3_H__
-
-#include "Point3.hpp"
+#ifndef __POINT3_H__
+#define __POINT3_H__
 
 #include <iostream>
 #include <math.h>
 #include <limits>
 
 template<typename T>
-class Vec3 : public Point3<T>
+class Point3
 {
 public:
-	typedef Vec3<T> ThisType;
-	typedef Point3<T> Point3Type;
+	typedef Point3<T> ThisType;
 
-	Vec3()
+	Point3()
 	{
 		Assign(T(0), T(0), T(0));
 	};
 
-	Vec3( const ThisType& v )
+	Point3( const ThisType& v )
 	{
-		Assign(v.x, v.y, v.z);
+		Assign(v);
 	};
 
-	Vec3( const Point3Type& p )
-	{
-		Assign(p);
-	};
-
-	Vec3( T fx, T fy, T fz )
+	Point3( T fx, T fy, T fz )
 	{
 		Assign(fx, fy, fz);
 	};
 
-	Vec3( const T xyzArray[3] )
+	Point3( const T xyzArray[3] )
 	{
 		Assign(xyzArray[0], xyzArray[1], xyzArray[2]);
 	};
 
-	~Vec3()
+	~Point3()
 	{
 		Assign(T(0), T(0), T(0));
 	};
 
 	friend std::ostream& operator << (std::ostream& output, const ThisType& v)
 	{
-		output << "Vector(" << v.x << ", " << v.y << ", " << v.z << ")";
+		output << "Point(" << v.x << ", " << v.y << ", " << v.z << ")";
 		return output;
 	};
 
@@ -80,12 +72,12 @@ public:
 
 	ThisType operator * ( const T& f ) const
 	{
-		return ThisType(x * v.x, y * v.y, z * v.z);
+		return ThisType(x * f, y * f, z * f);
 	};
 
 	ThisType operator / ( const T& f ) const
 	{
-		return ThisType(x / v.x, y / v.y, z / v.z);
+		return ThisType(x / f, y / f, z / f);
 	};
 	
 	ThisType operator += ( const ThisType& v )
@@ -121,57 +113,23 @@ public:
 
 		return bRes; 
 	};
-
-	ThisType	Revert()
+		
+	T x, y, z;
+protected:
+	inline void Assign(T fx, T fy, T fz)
 	{
-		return ThisType(-x,-y,-z);
-	}
-
-	ThisType	Normalize()
-	{
-		const T d = Length();
-
-		if( d > std::numeric_limits<T>::epsilon() )
-		{
-			(*this) /= d;
-		}
-		else
-		{
-			(*this) = T(0);
-		}
-
-		return (*this);
-	}
-
-	ThisType	Normal() const
-	{
-		ThisType ret(*this);
-		ret.Normalize();
-		return ret;
+		x = fx;
+		y = fy;
+		z = fz;
 	};
 
-	T	Length() const
+	inline void Assign(const ThisType& v)
 	{
-		return T(sqrt( x*x + y*y+ z*z ));
+		Assign(v.x, v.y, v.z);
 	};
-
-	T	DotProduct( const ThisType& v ) const
-	{
-		const T ret = x * v.x + y * v.y + z * v.z;
-		return ret;
-	};
-
-	ThisType CrossProduct( const ThisType& v ) const
-	{
-		const T fx = y * v.z - z * v.y;
-		const T fy = z * v.x - x * v.z;
-		const T fz = x * v.y - y * v.x;
-
-		return ThisType(fx, fy, fz);
-	}
 };
 
-typedef Vec3<float> Vec3F;
-typedef Vec3<double> Vec3D;
+typedef Point3<float> Point3F;
+typedef Point3<double> Point3D;
 
 #endif
