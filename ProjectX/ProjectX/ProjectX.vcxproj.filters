@@ -16,9 +16,15 @@
     <Filter Include="Header Files\Math">
       <UniqueIdentifier>{f9288cc8-bc27-407a-a807-9c2883b909f2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Radiolocation">
+      <UniqueIdentifier>{6ea0608c-ea77-4a3f-a942-870b759af0ac}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
+    <None Include="Radiolocation\Calc.inl">
+      <Filter>Header Files\Radiolocation</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -38,6 +44,9 @@
     </ClInclude>
     <ClInclude Include="Math\Point3.hpp">
       <Filter>Header Files\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Radiolocation\Calc.hpp">
+      <Filter>Header Files\Radiolocation</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

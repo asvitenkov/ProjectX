@@ -39,6 +39,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>false</LinkIncremental>
+    <IncludePath>$(ProjectDir);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -72,6 +73,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <None Include="Radiolocation\Calc.inl" />
     <None Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
@@ -79,6 +81,7 @@
     <ClInclude Include="Math\Point3.hpp" />
     <ClInclude Include="Math\Triangle.hpp" />
     <ClInclude Include="Math\Vector3.hpp" />
+    <ClInclude Include="Radiolocation\Calc.hpp" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>

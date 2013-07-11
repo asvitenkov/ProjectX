@@ -78,6 +78,26 @@ public:
 		return ThisType(x + v.x, y + v.y, z + v.z);
 	};
 
+	ThisType operator * ( const ThisType& v ) const
+	{
+		return ThisType(x * v.x, y * v.y, z * v.z);
+	};
+
+	ThisType operator / ( const ThisType& v ) const
+	{
+		return ThisType(x / v.x, y / v.y, z / v.z);
+	};
+
+	ThisType operator - ( const T& f ) const
+	{
+		return ThisType(x - v.x, y - v.y, z - v.z);
+	};
+
+	ThisType operator + ( const T& f ) const
+	{
+		return ThisType(x + v.x, y + v.y, z + v.z);
+	};
+
 	ThisType operator * ( const T& f ) const
 	{
 		return ThisType(x * v.x, y * v.y, z * v.z);
@@ -150,9 +170,16 @@ public:
 		return ret;
 	};
 
+	T	LengthSquared() const
+	{
+		const T lengthSquared = x*x + y*y+ z*z;
+		return lengthSquared;
+	};
+
 	T	Length() const
 	{
-		return T(sqrt( x*x + y*y+ z*z ));
+		const T length = sqrt(LengthSquared());
+		return length;
 	};
 
 	T	DotProduct( const ThisType& v ) const

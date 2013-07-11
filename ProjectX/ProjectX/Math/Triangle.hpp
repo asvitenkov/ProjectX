@@ -103,6 +103,17 @@ public:
 		return (*this);
 	};
 
+	PointType operator [] ( const unsigned int index ) const
+	{
+		if(index == 0) return p1;
+		if(index == 1) return p2;
+		if(index == 2) return p3;
+
+		assert("Out of bounds.");
+
+		return PointType(0);
+	};
+
 	bool operator == ( const ThisType& v ) const
 	{
 		bool bRes 
@@ -124,7 +135,19 @@ public:
 
 		return norm;
 	};
-		
+
+	T Square() const
+	{
+		VecType v1(p1.x - p2.x, p1.y - p2.y, p1.z - p2.z);
+		VecType v2(p2.x - p3.x, p2.y - p3.y, p2.z - p3.z);
+
+		VecType v3 = v1.CrossProduct(v2);
+
+		const T square = v3.Length()/2;
+
+		return square;
+	};
+
 	PointType p1, p2, p3;
 private:
 	inline void Assign(PointType p31, PointType p32, PointType p33)

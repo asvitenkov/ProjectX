@@ -5,6 +5,8 @@
 #include <math.h>
 #include <limits>
 
+#include <assert.h>
+
 template<typename T>
 class Point3
 {
@@ -104,6 +106,17 @@ public:
 		return (*this);
 	};
 
+	T operator [] ( const unsigned int index ) const
+	{
+		if(index == 0) return x;
+		if(index == 1) return y;
+		if(index == 2) return z;
+
+		assert("Out of bounds.");
+
+		return T(0);
+	};
+
 	bool operator == ( const ThisType& v ) const
 	{
 		bool bRes 
@@ -113,6 +126,13 @@ public:
 
 		return bRes; 
 	};
+
+	T ManhattanLength() const
+	{
+		const T length = x + y + z;
+		return length;
+	};
+
 		
 	T x, y, z;
 protected:
