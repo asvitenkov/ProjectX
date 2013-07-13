@@ -6,6 +6,16 @@
 #include "Math/Vector3.hpp"
 #include "Math/Complex.hpp"
 
+// Электрическая проводимость
+namespace ElCondType
+{
+	enum TYPE
+	{
+		Metall = 0,
+		Dielectric = -1
+	};
+}
+
 template<typename T>
 class Calc
 {

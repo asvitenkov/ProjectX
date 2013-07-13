@@ -106,7 +106,7 @@ public:
 		return (*this);
 	};
 
-	T operator [] ( const unsigned int index ) const
+	T operator [] ( const unsigned int index )
 	{
 		if(index == 0) return x;
 		if(index == 1) return y;
@@ -114,7 +114,18 @@ public:
 
 		assert("Out of bounds.");
 
-		return T(0);
+		return x;
+	};
+
+	T& operator [] ( const unsigned int index ) const
+	{
+		if(index == 0) return x;
+		if(index == 1) return y;
+		if(index == 2) return z;
+
+		assert("Out of bounds.");
+
+		return x;
 	};
 
 	bool operator == ( const ThisType& v ) const

@@ -32,6 +32,10 @@ int _tmain(int argc, _TCHAR* argv[])
 	Calc<float> cur;
 	cur.FieldOfTriangle(tr);
 
+	//std::complex<double> result = std::complex<double>(-1,12);
+	//result = result * std::complex<double>(0);
+	//std::cout << result << std::endl;
+
 	_getch();
 	return 0;
 }

@@ -1,3 +1,9 @@
+extern "C"
+{
+#include <ccomplex>
+};
+
+
 template<typename T>
 Calc<T>::Calc()
 {
@@ -20,18 +26,14 @@ template<typename T>
 void Calc<T>::FieldOfTriangle(const TriangleType& tr)
 {
 	ComplexType ji(0,1);
-	ComplexType e1;
-	ComplexType m1;
+	ComplexType e1, m1;  //e1,m1 - относительные проницаемости
 	ComplexType cn[3];
 	ComplexType cdr3[3];
 	ComplexType pr1[3];
 
-	T tol(0);
+	ElCondType::TYPE tol; // tol - признак (0-металл, -1 - диэлектрик)
 	T z[3][3];
 	T r0[3];
-	T p0[3];
-	T p1[3];
-	T n0[3][3];
 
 	ComplexType et[3];
 	ComplexType ht[3];
@@ -53,22 +55,21 @@ void Calc<T>::FieldOfTriangle(const TriangleType& tr)
 	T nd(0);
 	T h(0);
 
-	T p0t[3];
 	T rr1[3];
-	T r0t[3];
+	VecType r0t;
 
-	T r0p[3];
+	VecType r0p;
 	T dr3[3];
 	T d(0);
-	T n[3];
-	
+
 	ComplexType f[3];
 	T ad(0);
 	T k0(0);
-	T tes(0);
 
 	VecType r1; // TODO: Требуется правильная инициализация
 	VecType rr; // TODO: Требуется правильная инициализация
+	VecType p0; // TODO: Требуется правильная инициализация
+	VecType p1; // TODO: Требуется правильная инициализация
 	
 	/*
 	da=(z(2,2)-z(3,2))*(z(1,3)-z(3,3))-(z(1,2)-z(3,2))*(z(2,3)-z(3,3)) ! da=z(,)*z(,)-z(,)*z(,)
@@ -125,5 +126,94 @@ void Calc<T>::FieldOfTriangle(const TriangleType& tr)
 		}
 	}
 	
+	/*
+	! Вычисление полного рассеянного поля в вершинах треугольника 
+	do i2=1,3 ! НОМЕР ТОЧКИ ТРЕУГОЛЬНИКА	
+	*/
+	PointType n;
+	for (int i = 0; i < 3 ; i++)
+	{
+		/*
+		do i6=1,3! КООРДИНАТА ТРЕУГОЛЬНИКА(X=1),(Y=2), (Z=3)  
+			n(i6)=n0(i2,i6)
+		end do
+		tes=0
+		*/		
+		n = tr[i];
+
+		/*
+		do i6=1,3 ! НОМЕР ТОЧКИ ТРЕУГОЛЬНИКА
+			tes=tes+p0(i6)*n(i6)
+		end do
+		p0t=p0-n*tes
+		tes=0
+		*/
+		tes = (p0*n).ManhattanLength();
+		VecType p0t = (p0 - n*tes);
+
+		/*
+		do i6=1,3 ! НОМЕР ТОЧКИ ТРЕУГОЛЬНИКА
+			tes=tes+rr(i6)*n(i6)
+		end do
+		a=0
+		*/
+		tes = (rr*n).ManhattanLength();
+		a = 0;
+
+		/*
+		if (abs(tes).gt.0.001) then
+		*/
+		if(abs(tes) > std::numeric_limits<float>::epsilon())
+		{
+			/*
+			tes2=tes
+			c0=csqrt(1.-(1-tes2*tes2)/(e1*m1))
+			c2=c0
+			*/
+			T tes2 = tes;
+
+			ComplexType sqrtRoot(T(1)-(T(1)-tes2*tes2));
+			sqrtRoot = sqrtRoot/(e1*m1);
+
+			c0 = std::sqrt(sqrtRoot);
+			c2 = c0;
+
+			/*
+			! Расчет поля для металлического треугольника
+			*/
+			//if (tol.ge.0.0) then 
+			if(tol == ElCondType::Metall)
+			{
+				//c1=k0*csqrt(e1*m1)*tol*c0;
+				c1 = k0*std::sqrt(e1*m1)*ElCondType::Metall*c0; // Ноль?!												
+				
+				//c=csqrt(m1/e1)*c0*cdsin(c1)/cdcos(c1)
+				c = std::sqrt(m1/e1)*c0*std::sin(c1)/std::cos(c1);	
+				
+				//c0=c*tes2
+				c0 = c*tes2;
+
+				//c1=(ji*c0-1)/(ji*c0+1)
+				c1 = (ji*c0)/(ji*c0+1);
+
+				//call wekt(n,rr,r0p,amod) 
+				r0p = VecType(n).CrossProduct(rr);
+				T amod = r0p.Length();
+
+				//r0t=rr-n*tes2
+				r0t = rr - n*tes2;
+
+//				p1t=c1*p0t+2*ji*c/(ji*c0+1)*(r0t*(r0t(1)*p0(1)+r0t(2)*p0(2)
+//#     +r0t(3)*p0(3))/(ji*c+tes2)+r0p*(r0p(1)*p0(1)+r0p(2)*p0(2)
+//#     +r0p(3)*p0(3))/e1/m1/(ji*c+c2*c2/tes2))
+
+				// (r0t*(r0t(1)*p0(1)+r0t(2)*p0(2)+r0t(3)*p0(3))
+				VecType tmpMulti(r0t*(r0t*p0).ManhattanLength());
+				p1t  = c1*p0t;
+				p1t += 2*ji*c/(ji*c0+1)*((tmpMulti)/(ji*c+tes2)+tmpMulti/e1/m1/(ji*c+c2*c2/tes2));
+			}
+		}
+	}
+
 	return;
 }

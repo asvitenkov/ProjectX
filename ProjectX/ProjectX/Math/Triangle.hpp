@@ -103,7 +103,7 @@ public:
 		return (*this);
 	};
 
-	PointType operator [] ( const unsigned int index ) const
+	const PointType& operator [] ( const unsigned int index ) const
 	{
 		if(index == 0) return p1;
 		if(index == 1) return p2;
@@ -111,8 +111,20 @@ public:
 
 		assert("Out of bounds.");
 
-		return PointType(0);
+		return p1;
 	};
+
+	PointType operator [] ( const unsigned int index )
+	{
+		if(index == 0) return p1;
+		if(index == 1) return p2;
+		if(index == 2) return p3;
+
+		assert("Out of bounds.");
+
+		return p1;
+	};
+
 
 	bool operator == ( const ThisType& v ) const
 	{
