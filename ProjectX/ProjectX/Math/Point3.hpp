@@ -132,7 +132,6 @@ public:
 		const T length = x + y + z;
 		return length;
 	};
-
 		
 	T x, y, z;
 protected:

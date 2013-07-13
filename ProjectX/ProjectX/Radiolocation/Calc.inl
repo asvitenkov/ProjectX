@@ -26,7 +26,7 @@ void Calc<T>::FieldOfTriangle(const TriangleType& tr)
 	ComplexType cdr3[3];
 	ComplexType pr1[3];
 
-	T tol;
+	T tol(0);
 	T z[3][3];
 	T r0[3];
 	T p0[3];
@@ -47,11 +47,11 @@ void Calc<T>::FieldOfTriangle(const TriangleType& tr)
 	ComplexType tes5;
 	T a1(0);
 	T a2(0);
-	T na;
-	T nb;
-	T nc;
-	T nd;
-	T h;
+	T na(0);
+	T nb(0);
+	T nc(0);
+	T nd(0);
+	T h(0);
 
 	T p0t[3];
 	T rr1[3];
@@ -59,14 +59,14 @@ void Calc<T>::FieldOfTriangle(const TriangleType& tr)
 
 	T r0p[3];
 	T dr3[3];
-	T d;
+	T d(0);
 	T n[3];
 	
 	ComplexType f[3];
-	T ad;
-	T k0;
-	T dd;
-	T tes;
+	T ad(0);
+	T k0(0);
+	T dd(0);
+	T tes(0);
 
 	VecType r1;
 	VecType rr;
