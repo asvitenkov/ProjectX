@@ -13,11 +13,12 @@
 
 int _tmain(int argc, _TCHAR* argv[])
 {
-	Point3F point1(-1, 0, 2);
-	Point3F point2( 1,-2, 5);
-	Point3F point3( 3, 0, 4);
-
 	typedef float _Ty;
+
+	Point3<_Ty> point1(-1, 0, 2);
+	Point3<_Ty> point2( 1,-2, 5);
+	Point3<_Ty> point3( 3, 0, 4);
+
 	Triangle<_Ty> tr(point1, point2, point3);	//!z  - координаты точек 
 	Vec3<_Ty> p0;				//!P0,P1 - пол€ризации передатчика и приемника
 	Vec3<_Ty> p1;				//!P0,P1 - пол€ризации передатчика и приемника
@@ -27,7 +28,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	ElCondType::TYPE tol(ElCondType::Metall); //!tol - признак (0-металл, -1 - диэлектрик)
 	Vec3<std::complex<_Ty>> ep;	// !ep - расчитанное поле
 	
-	Calc<float> cur;
+	Calc<_Ty> cur;
 	cur.FieldOfTriangle(tr, p0, p1, k0, e1, m1, tol, ep);
 
 	std::cout << ep;
