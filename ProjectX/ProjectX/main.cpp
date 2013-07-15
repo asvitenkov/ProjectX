@@ -13,28 +13,24 @@
 
 int _tmain(int argc, _TCHAR* argv[])
 {
-	Vec3F v(3, 4, 1);
+	Point3F point1(-1, 0, 2);
+	Point3F point2( 1,-2, 5);
+	Point3F point3( 3, 0, 4);
 
-	std::cout << v;
-	std::cout << v.Normal();
+	typedef float _Ty;
+	Triangle<_Ty> tr(point1, point2, point3);	//!z  - координаты точек 
+	Vec3<_Ty> p0;				//!P0,P1 - поляризации передатчика и приемника
+	Vec3<_Ty> p1;				//!P0,P1 - поляризации передатчика и приемника
+	_Ty k0;						//!k0 - волновое число
+	std::complex<_Ty> e1;		//e1,m1 - относительные проницаемости 
+	std::complex<_Ty> m1;		//e1,m1 - относительные проницаемости
+	ElCondType::TYPE tol(ElCondType::Metall); //!tol - признак (0-металл, -1 - диэлектрик)
+	Vec3<std::complex<_Ty>> ep;	// !ep - расчитанное поле
 	
-	v.Normalize();
-	std::cout << v << " " << v.Revert();
-
-	Point3F p1(-1, 0, 2);
-	Point3F p2( 1,-2, 5);
-	Point3F p3( 3, 0, 4);
-
-	TriangleF tr(p1,p2,p3);
-
-	std::cout << tr.Square();
-
 	Calc<float> cur;
-	cur.FieldOfTriangle(tr);
+	cur.FieldOfTriangle(tr, p0, p1, k0, e1, m1, tol, ep);
 
-	//std::complex<double> result = std::complex<double>(-1,12);
-	//result = result * std::complex<double>(0);
-	//std::cout << result << std::endl;
+	std::cout << ep;
 
 	_getch();
 	return 0;

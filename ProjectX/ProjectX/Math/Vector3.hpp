@@ -2,6 +2,7 @@
 #define __VEC3_H__
 
 #include "Point3.hpp"
+#include "Complex.hpp"
 
 #include <iostream>
 #include <math.h>
@@ -13,6 +14,7 @@ class Vec3 : public Point3<T>
 public:
 	typedef Vec3<T> ThisType;
 	typedef Point3<T> Point3Type;
+	typedef std::complex<T> ComplexType;
 
 	Vec3()
 	{
@@ -100,12 +102,12 @@ public:
 
 	ThisType operator * ( const T& f ) const
 	{
-		return ThisType(x * v.x, y * v.y, z * v.z);
+		return ThisType(x * f, y * f, z * f);
 	};
 
 	ThisType operator / ( const T& f ) const
 	{
-		return ThisType(x / v.x, y / v.y, z / v.z);
+		return ThisType(x / f, y / f, z / f);
 	};
 	
 	ThisType operator += ( const ThisType& v )
@@ -197,6 +199,14 @@ public:
 		return ThisType(fx, fy, fz);
 	}
 };
+
+template<typename From, typename To>
+Vec3<To> vector_cast(const Vec3<From>& v)
+{
+	const Vec3<To> toVector(To(v.x), To(v.y), To(v.z));
+
+	return toVector;
+}
 
 typedef Vec3<float> Vec3F;
 typedef Vec3<double> Vec3D;

@@ -27,8 +27,18 @@ public:
 	typedef Vec3<T>		VecType;
 	typedef Point3<T>	PointType;
 	typedef Triangle<T> TriangleType;
+	typedef Vec3<ComplexType> CVecType;
 
-	void FieldOfTriangle(const TriangleType& tr);
+	void FieldOfTriangle(	
+		const TriangleType& tr,		//!z  - координаты точек 
+		const VecType& p0,			//!P0,P1 - поляризации передатчика и приемника
+		const VecType& p1,			//!P0,P1 - поляризации передатчика и приемника
+		const T& k0,				//!k0 - волновое число
+		const ComplexType& e1,		//e1,m1 - относительные проницаемости 
+		const ComplexType& m1,		//e1,m1 - относительные проницаемости
+		const ElCondType::TYPE tol, //!tol - признак (0-металл, -1 - диэлектрик)
+		CVecType& ep				// !ep - расчитанное поле
+);
 private:
 	void Init();
 };
