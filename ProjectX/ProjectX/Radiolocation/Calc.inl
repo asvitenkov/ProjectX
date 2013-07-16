@@ -29,7 +29,7 @@ void Calc<T>::FieldOfTriangle(
 	const ComplexType& e1, //e1,m1 - относительные проницаемости 
 	const ComplexType& m1, //e1,m1 - относительные проницаемости
 	const ElCondType::TYPE tol,  //!tol - признак (0-металл, -1 - диэлектрик)
-	CVecType& ep// !ep - расчитанное поле
+	ComplexType& ep// !ep - расчитанное поле
 	) 
 {
 	T a1(0);
@@ -159,7 +159,7 @@ void Calc<T>::FieldOfTriangle(
 		/*
 		if (abs(tes).gt.0.001) then
 		*/
-		if(abs(tes) > std::numeric_limits<float>::epsilon())
+		if(tes > std::numeric_limits<float>::epsilon())
 		{
 			/*
 			tes2=tes

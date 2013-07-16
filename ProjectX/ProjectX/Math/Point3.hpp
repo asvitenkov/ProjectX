@@ -131,9 +131,9 @@ public:
 	bool operator == ( const ThisType& v ) const
 	{
 		bool bRes 
-			=  (x - v.x) < std::numeric_limits<T>::epsilon()
-			&& (y - v.y) < std::numeric_limits<T>::epsilon()
-			&& (z - v.z) < std::numeric_limits<T>::epsilon();
+			=  abs(x - v.x) < std::numeric_limits<T>::epsilon()
+			&& abs(y - v.y) < std::numeric_limits<T>::epsilon()
+			&& abs(z - v.z) < std::numeric_limits<T>::epsilon();
 
 		return bRes; 
 	};

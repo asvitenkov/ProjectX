@@ -26,7 +26,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	std::complex<_Ty> e1;		//e1,m1 - относительные проницаемости 
 	std::complex<_Ty> m1;		//e1,m1 - относительные проницаемости
 	ElCondType::TYPE tol(ElCondType::Metall); //!tol - признак (0-металл, -1 - диэлектрик)
-	Vec3<std::complex<_Ty>> ep;	// !ep - расчитанное поле
+	std::complex<_Ty> ep;	// !ep - расчитанное поле
 	
 	Calc<_Ty> cur;
 	cur.FieldOfTriangle(tr, p0, p1, k0, e1, m1, tol, ep);

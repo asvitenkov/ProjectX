@@ -37,7 +37,7 @@ public:
 		const ComplexType& e1,		//e1,m1 - относительные проницаемости 
 		const ComplexType& m1,		//e1,m1 - относительные проницаемости
 		const ElCondType::TYPE tol, //!tol - признак (0-металл, -1 - диэлектрик)
-		CVecType& ep				// !ep - расчитанное поле
+		ComplexType& ep				// !ep - расчитанное поле
 );
 private:
 	void Init();
