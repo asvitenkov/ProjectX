@@ -43,3 +43,10 @@ HEADERS  += mainwindow.h \
     Math/MathDefines.h
 
 FORMS    += mainwindow.ui
+
+
+
+LIBS += -L$$PWD/libfortran/ -RCS_functions_cyl
+
+INCLUDEPATH += $$PWD/libfortran
+DEPENDPATH += $$PWD/libfortran
