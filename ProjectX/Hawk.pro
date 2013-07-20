@@ -44,4 +44,27 @@ HEADERS  += mainwindow.h \
             Math/MathDefines.h \
             Math/TriangleShared.h
 
+HEADERS  += mainwindow.h \
+            modelmaker.h \
+            triangles/structs.h \
+    triangles/algs.h \
+    modelviewer.h \
+    triangles/exception.h \
+    edgeselector.h \
+    processthread.h \
+    bsp/BSPAlg.h \
+    triangles/blockanalizator.h \
+    Math/Vector3.hpp \
+    Math/Triangle.hpp \
+    Math/Point3.hpp \
+    Math/Complex.hpp \
+    Math/MathDefines.h \
+    Calc/ComputeFieldDll.hpp \
+    Calc/IComputeField.hpp
+
 FORMS    += mainwindow.ui
+
+LIBS += -L$$PWD/libfortran/ -lRCS_functions_cyl
+INCLUDEPATH += $$PWD/libfortran
+DEPENDPATH += $$PWD/libfortran
+PRE_TARGETDEPS += $$PWD/libfortran/RCS_functions_cyl.lib
