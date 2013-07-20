@@ -24,7 +24,7 @@ SOURCES += main.cpp\
     reditrectthread.cpp \
     cleanthread.cpp \
     bsp/BSPAlg.cpp \
-    triangles/blockanalizator.cpp \
+    triangles/blockanalizator.cpp
 
 HEADERS  += mainwindow.h \
             modelmaker.h \
@@ -40,13 +40,13 @@ HEADERS  += mainwindow.h \
     Math/Triangle.hpp \
     Math/Point3.hpp \
     Math/Complex.hpp \
-    Math/MathDefines.h
+    Math/MathDefines.h \
+    Calc/ComputeFieldDll.hpp \
+    Calc/IComputeField.hpp
 
 FORMS    += mainwindow.ui
 
-
-
-LIBS += -L$$PWD/libfortran/ -RCS_functions_cyl
-
+LIBS += -L$$PWD/libfortran/ -lRCS_functions_cyl
 INCLUDEPATH += $$PWD/libfortran
 DEPENDPATH += $$PWD/libfortran
+PRE_TARGETDEPS += $$PWD/libfortran/RCS_functions_cyl.lib
