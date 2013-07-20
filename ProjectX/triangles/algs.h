@@ -35,7 +35,6 @@ public:
     void writeFile(const char* path, QVector<TriangleShared>&  iangles);
 
     QVector<TriangleShared> srcTriangles;
-    QVector<TPoint3> redirectedPoints_3D;
     QVector<TPoint2> points_2D;
     QVector<TriangleShared> outTriangles;
 
@@ -47,9 +46,6 @@ private:
 
     /* main action groups */
     void cleanPhase2();
-
-    TPoint3 countVectorProduct(TPoint3 a, TPoint3 b);
-    double countScalarProduct(TPoint3 a, TPoint3 b);
 
     /* */
     void cleanByNormal(const QVector<TriangleShared>&  iangles);

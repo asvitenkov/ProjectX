@@ -16,7 +16,6 @@ public:
 
     void calcCenter();
     bool crossedTriangles(const TriangleShared& t2);
-    void findVectors();
     TVector countNormal() const;
     void findDistance(const TVector& v);
     bool crossedRadius(const TriangleShared& t2) const;
@@ -25,8 +24,6 @@ public:
 
     int A, B, C;
     double distance, radius;
-    TVector nVector,cVector,bVector,rVector;
-    TPoint3 aSystem,bSystem,cSystem,mSystem;
     TPoint3 center_3D, redirectedCenter_3D;
     bool dead;
 private:

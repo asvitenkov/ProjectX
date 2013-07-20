@@ -15,7 +15,7 @@
 QVector<TriangleShared> Algoritm::manipulate()
 {
     outTriangles.clear();
-    redirectedPoints_3D.clear();
+    TriangleShared::RedirectPoints.clear();
     points_2D.clear();
     checkedTrianglesCount = 0x0;
     time_t start_timestamp = time(NULL);
@@ -35,19 +35,18 @@ QVector<TriangleShared> Algoritm::manipulate()
     prepareTriangles();//v
     emit statusChanged("done\n");
 
-    /* redirect all points from TriangleShared::Points to redirectedPoints_3D vectors  AND RADIUSES*/
+    /* redirect all points from TriangleShared::Points to RedirectPoints vectors  AND RADIUSES*/
     redirectPoints();//v
     redirectRadiuses();
-    emit statusChanged("Reditect points: redirectedPoints_3D size is " + QString::number(redirectedPoints_3D.size()) +"\n");
+    emit statusChanged("Reditect points: RedirectPoints size is " + QString::number(TriangleShared::RedirectPoints.size()) +"\n");
 
     //find radiuses and distances from real  iangle to its redirect
     emit statusChanged("Finding radiuses: ");
     findRadiuses();
     emit statusChanged("done\n");
 
-    //find 2D redirect points ( pushing in points_2D )
     translate();
-    emit statusChanged("Translate: points_2D size is " + QString::number(points_2D.size()));
+    emit statusChanged("Translate: Amount equal to " + QString::number(points_2D.size()));
     emit statusChanged("done\n");
 
     //finding window size
@@ -237,10 +236,10 @@ void Algoritm::translate()          //// Ñ„Ð¾Ñ€Ð¼Ð¸Ñ€ÑƒÐµÑ�
     double c = cos(m_viewVector.Phi());
     double d = sin(m_viewVector.Phi());
 
-    for(int i = 0; i < redirectedPoints_3D.size(); ++i)
+    for(int i = 0; i < TriangleShared::RedirectPoints.size(); ++i)
     {
-        p.x = -d*redirectedPoints_3D[i].x + c*redirectedPoints_3D[i].y;
-        p.y = -a*c*redirectedPoints_3D[i].x + -a*d*redirectedPoints_3D[i].y + b*redirectedPoints_3D[i].z;
+        p.x = -d*TriangleShared::RedirectPoints[i].x + c*TriangleShared::RedirectPoints[i].y;
+        p.y = -a*c*TriangleShared::RedirectPoints[i].x + -a*d*TriangleShared::RedirectPoints[i].y + b*TriangleShared::RedirectPoints[i].z;
         points_2D.push_back(p);
     }
 }
@@ -263,7 +262,7 @@ bool Algoritm::redirectPoints()         //Ð¿Ñ€Ð¾ÐµÑ� Ð¸Ñ€ÑƒÐ�
 {
     for(int i = 0; i < TriangleShared::Points.size(); ++i)
     {
-        redirectedPoints_3D.push_back(redirectPoint(TriangleShared::Points[i], m_viewVector));
+        TriangleShared::RedirectPoints.push_back(redirectPoint(TriangleShared::Points[i], m_viewVector));
         TriangleShared::RedirectPoints.push_back(redirectPoint(TriangleShared::Points[i], m_viewVector));
     }
     return  true;
@@ -284,32 +283,7 @@ void Algoritm::prepareTriangles()
         outTriangles[i].dead = false;
         outTriangles[i].calcCenter();
         outTriangles[i].findDistance(m_viewVector);
-        outTriangles[i].findVectors();
-        findLocals(outTriangles[i]);
     }
-}
-
-TriangleShared Algoritm::findLocals(TriangleShared &t)// Ð½Ð°Ñ…Ð¾Ð´Ð¸Ñ‚ Ñ‚Ð¾Ñ‡ÐºÐ¸ Ð¾Ñ‚Ð½Ð¾ÑÐ¸Ñ‚ÐµÐ»ÑŒÐ½Ð¾ Ð±Ð°Ð·Ð¸ÑÐ° Ð¿Ð¾Ð»Ð¸Ð³Ð¾Ð½Ð°
-{
-    t.aSystem = translateLocal(TriangleShared::Points[t.A],t.cVector,t.nVector,t.bVector);
-    t.bSystem = translateLocal(TriangleShared::Points[t.B],t.cVector,t.nVector,t.bVector);
-    t.cSystem = translateLocal(TriangleShared::Points[t.C],t.cVector,t.nVector,t.bVector);
-    t.mSystem.x = (t.aSystem.x + t.bSystem.x + t.cSystem.x)/3;
-    t.mSystem.y = (t.aSystem.y + t.bSystem.y + t.cSystem.y)/3;
-    t.mSystem.z = (t.aSystem.z + t.bSystem.z + t.cSystem.z)/3;
-    TPoint3 pVec(m_viewVector);
-
-    t.rVector = translateLocal(pVec,t.cVector,t.nVector,t.bVector);
-    return t;
-}
-
-TPoint3 Algoritm::translateLocal(TPoint3 p, TPoint3 cVector, TPoint3 nVector, TPoint3 bVector)///Ð¿ÐµÑ€ÐµÐ²Ð¾Ð´Ð¸Ñ‚ Ñ‚Ð¾Ñ‡ÐºÑƒ p Ð² Ð±Ð°Ð·Ð¸Ñ Ñ‚Ñ€ÐµÑƒÐ³Ð¾Ð»ÑŒÐ½Ð¸ÐºÐ°
-{
-    TPoint3 tempP;
-    tempP.x = cVector.x*p.x + cVector.y*p.y + cVector.z*p.z;
-    tempP.y = nVector.x*p.x + nVector.y*p.y + nVector.z*p.z;
-    tempP.z = bVector.x*p.x + bVector.y*p.y + bVector.z*p.z;
-    return tempP;
 }
 
 void Algoritm::redirectRadiuses()////Ð½Ð°Ñ…Ð¾Ð´Ð¸Ñ‚ Ñ� ÐµÐ½Ñ‚Ñ€ Ñ‚Ñ€ÐµÑƒÐ³Ð¾Ð»ÑŒÐ½Ð¸ÐºÐ° Ð´Ð»Ñ Ð½Ð°Ñ…Ð¾Ð¶Ð´ÐµÐ½Ð¸Ñ Ñ€Ð°Ð´Ð¸ÑƒÑÐ°

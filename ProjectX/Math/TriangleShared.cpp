@@ -11,9 +11,6 @@ TriangleShared::TriangleShared()
 TriangleShared::TriangleShared(const TriangleShared& tr)
     : A(tr.A), B(tr.B), C(tr.C)
     , distance(tr.distance), radius(tr.radius)
-    , nVector(tr.nVector), cVector(tr.cVector), bVector(tr.bVector)
-    , aSystem(tr.aSystem), bSystem(tr.bSystem)
-    , cSystem(tr.cSystem), mSystem(tr.mSystem)
     , center_3D(tr.center_3D), redirectedCenter_3D(tr.redirectedCenter_3D)
     , dead(tr.dead)
 {
@@ -51,20 +48,6 @@ bool TriangleShared::crossedLines(TPoint2 p11, TPoint2 p12, TPoint2 p21, TPoint2
     if(((x <= qMax(p11.x,p12.x))&&(x >= qMin(p12.x,p11.x)))&&((x <= qMax(p22.x,p21.x))&&(x >= qMin(p21.x,p22.x))))
         return true;
     return false;
-}
-
-
-void TriangleShared::findVectors()
-{
-    float d = sqrt((TriangleShared::Points[A].x - center_3D.x)*(TriangleShared::Points[A].x - center_3D.x)+
-                   (TriangleShared::Points[A].y - center_3D.y)*(TriangleShared::Points[A].y - center_3D.y)+
-                   (TriangleShared::Points[A].z - center_3D.z)*(TriangleShared::Points[A].z - center_3D.z));
-
-    nVector = countNormal();
-    cVector.x = (TriangleShared::Points[A].x - center_3D.x)/d;
-    cVector.y = (TriangleShared::Points[A].y - -center_3D.y)/d;
-    cVector.z = (TriangleShared::Points[A].z - center_3D.z)/d;
-    bVector = cVector.CrossProduct(nVector);
 }
 
 void TriangleShared::findDistance(const TVector& v)
