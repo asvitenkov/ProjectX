@@ -41,10 +41,9 @@ public:
 
 	~Vec3()
 	{
-		Assign(T(0), T(0), T(0));
 	};
 
-	friend std::ostream& operator << (std::ostream& output, const ThisType& v)
+    friend std::ostream& operator << (std::ostream& output, const ThisType& v)
 	{
 		output << "Vector(" << v.x << ", " << v.y << ", " << v.z << ")";
 		return output;
@@ -196,6 +195,16 @@ public:
 
 		return ThisType(fx, fy, fz);
 	}
+
+    T Angle(const ThisType& v)
+    {
+        return acos( DotProduct(v)/(Length()*v.Length()) )*180/M_PI;
+    }
+
+    ThisType Orto()
+    {
+        return (*this)/Length();
+    }
 
 	T Theta() const
 	{

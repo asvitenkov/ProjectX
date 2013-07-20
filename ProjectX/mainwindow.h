@@ -17,11 +17,11 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
-    ModelViewer inputModelMaker, outputModelMaker;
+    ModelViewer inputModelMaker;
 private:
-    QVector<triangle_t> triangles;
+    QVector<TriangleShared> triangles;
     Ui::MainWindow *ui;
-    QVector<triangle_t> data;
+    QVector<TriangleShared> data;
     Algoritm *alg;
     ProcessThread *pthread;
 
