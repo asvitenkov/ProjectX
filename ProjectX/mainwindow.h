@@ -19,9 +19,9 @@ public:
     ~MainWindow();
     ModelViewer inputModelMaker, outputModelMaker;
 private:
-    QVector<triangle_t> triangles;
+    QVector<TriangleShared> triangles;
     Ui::MainWindow *ui;
-    QVector<triangle_t> data;
+    QVector<TriangleShared> data;
     Algoritm *alg;
     ProcessThread *pthread;
 

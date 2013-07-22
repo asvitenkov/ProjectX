@@ -3,7 +3,8 @@
 
 #include <QGLWidget>
 #include <QVector>
-#include "triangles/structs.h"
+
+#include "Math/TriangleShared.h"
 
 #define OFFSET_RATIO 100
 
@@ -14,7 +15,7 @@ public:
     explicit ModelMaker(QWidget *parent = 0);
 
     /* Установка вектора треугольников для прорисовки */
-    void setTriangles(const QVector<triangle_t>& t);
+    void setTriangles(const QVector<TriangleShared>& t);
     /* Установка точек\вершин треугольника */
     void setPoints(QVector<TPoint3> *p);
     /* Установка точек лежащих на гранях для прорисовки */
@@ -57,7 +58,7 @@ private:
 
 
     /* Вектора треугольников, вершин, вершин принадлежащих граням */
-    QVector<triangle_t> UsingTriangles;
+    QVector<TriangleShared> UsingTriangles;
     QVector<TPoint3> *points;
     QVector<unsigned int> borderPointsIndexes;
 

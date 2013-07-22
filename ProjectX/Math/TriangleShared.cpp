@@ -1,9 +1,11 @@
 #include "TriangleShared.h"
 
-QVector<TPoint3> TriangleShared::Points;
+QVector<TPoint2> TriangleShared::Points2D;
+QVector<TPoint3> TriangleShared::Points3D;
 QVector<TPoint3> TriangleShared::RedirectPoints;
 
 TriangleShared::TriangleShared()
+    : dead(false)
 {
 
 }
@@ -11,35 +13,41 @@ TriangleShared::TriangleShared()
 TriangleShared::TriangleShared(const TriangleShared& tr)
     : A(tr.A), B(tr.B), C(tr.C)
     , distance(tr.distance), radius(tr.radius)
-    , nVector(tr.nVector), cVector(tr.cVector), bVector(tr.bVector)
-    , aSystem(tr.aSystem), bSystem(tr.bSystem)
-    , cSystem(tr.cSystem), mSystem(tr.mSystem)
-    , center_3D(tr.center_3D), redirectedCenter_3D(tr.redirectedCenter_3D)
+    , m_Center3D(tr.m_Center3D), m_RedirectedCenter3D(tr.m_RedirectedCenter3D)
     , dead(tr.dead)
 {
 
 }
 
-void TriangleShared::calcCenter()
+void TriangleShared::Set(int _A, int _B, int _C)
 {
-    center_3D.x =(Points[A].x + Points[B].x + Points[C].x)/3;
-    center_3D.y =(Points[A].y + Points[B].y + Points[C].y)/3;
-    center_3D.z =(Points[A].z + Points[B].z + Points[C].z)/3;
+    A = _A;
+    B = _B;
+    C = _C;
+}
+
+void TriangleShared::CaclFileds(const TVector& v)
+{
+    m_Center3D.x =(p1().x + p2().x + p3().x)/3;
+    m_Center3D.y =(p1().y + p2().y + p3().y)/3;
+    m_Center3D.z =(p1().z + p2().z + p3().z)/3;
+
+    m_RedirectedCenter3D = MathHelper::Redirect(&m_Center3D, &v);
 }
 
 bool TriangleShared::crossedTriangles(const TriangleShared& t2)
 {
-    if(crossedLines(Points[A], Points[B], Points[t2.A], Points[t2.B])) return true;
-    if(crossedLines(Points[A], Points[C], Points[t2.A], Points[t2.B])) return true;
-    if(crossedLines(Points[B], Points[C], Points[t2.A], Points[t2.B])) return true;
+    if(crossedLines(Points2D[A], Points2D[B], Points2D[t2.A], Points2D[t2.B])) return true;
+    if(crossedLines(Points2D[A], Points2D[C], Points2D[t2.A], Points2D[t2.B])) return true;
+    if(crossedLines(Points2D[B], Points2D[C], Points2D[t2.A], Points2D[t2.B])) return true;
 
-    if(crossedLines(Points[A], Points[B], Points[t2.A], Points[t2.C])) return true;
-    if(crossedLines(Points[A], Points[C], Points[t2.A], Points[t2.C])) return true;
-    if(crossedLines(Points[B], Points[C], Points[t2.A], Points[t2.C])) return true;
+    if(crossedLines(Points2D[A], Points2D[B], Points2D[t2.A], Points2D[t2.C])) return true;
+    if(crossedLines(Points2D[A], Points2D[C], Points2D[t2.A], Points2D[t2.C])) return true;
+    if(crossedLines(Points2D[B], Points2D[C], Points2D[t2.A], Points2D[t2.C])) return true;
 
-    if(crossedLines(Points[A], Points[B], Points[t2.C], Points[t2.B])) return true;
-    if(crossedLines(Points[A], Points[C], Points[t2.C], Points[t2.B])) return true;
-    if(crossedLines(Points[B], Points[C], Points[t2.C], Points[t2.B])) return true;
+    if(crossedLines(Points2D[A], Points2D[B], Points2D[t2.C], Points2D[t2.B])) return true;
+    if(crossedLines(Points2D[A], Points2D[C], Points2D[t2.C], Points2D[t2.B])) return true;
+    if(crossedLines(Points2D[B], Points2D[C], Points2D[t2.C], Points2D[t2.B])) return true;
     return false;
 }
 
@@ -53,43 +61,30 @@ bool TriangleShared::crossedLines(TPoint2 p11, TPoint2 p12, TPoint2 p21, TPoint2
     return false;
 }
 
-
-void TriangleShared::findVectors()
-{
-    float d = sqrt((TriangleShared::Points[A].x - center_3D.x)*(TriangleShared::Points[A].x - center_3D.x)+
-                   (TriangleShared::Points[A].y - center_3D.y)*(TriangleShared::Points[A].y - center_3D.y)+
-                   (TriangleShared::Points[A].z - center_3D.z)*(TriangleShared::Points[A].z - center_3D.z));
-
-    nVector = countNormal();
-    cVector.x = (TriangleShared::Points[A].x - center_3D.x)/d;
-    cVector.y = (TriangleShared::Points[A].y - -center_3D.y)/d;
-    cVector.z = (TriangleShared::Points[A].z - center_3D.z)/d;
-    bVector = cVector.CrossProduct(nVector);
-}
-
 void TriangleShared::findDistance(const TVector& v)
 {
-    distance = (v.x*center_3D.x+v.y*center_3D.y+v.z*center_3D.z);
+    distance = (v.x*m_Center3D.x+v.y*m_Center3D.y+v.z*m_Center3D.z);
 }
 
 TVector TriangleShared::countNormal() const
 {
     TVector a, b;
-    a.x = TriangleShared::Points[B].x - TriangleShared::Points[A].x;
-    a.y = TriangleShared::Points[B].y - TriangleShared::Points[A].y;
-    a.z = TriangleShared::Points[B].z - TriangleShared::Points[A].z;
-    b.x = TriangleShared::Points[C].x - TriangleShared::Points[A].x;
-    b.y = TriangleShared::Points[C].y - TriangleShared::Points[A].y;
-    b.z = TriangleShared::Points[C].z - TriangleShared::Points[A].z;
+    a.x = TriangleShared::Points2D[B].x - TriangleShared::Points2D[A].x;
+    a.y = TriangleShared::Points2D[B].y - TriangleShared::Points2D[A].y;
+    a.z = TriangleShared::Points2D[B].z - TriangleShared::Points2D[A].z;
+    b.x = TriangleShared::Points2D[C].x - TriangleShared::Points2D[A].x;
+    b.y = TriangleShared::Points2D[C].y - TriangleShared::Points2D[A].y;
+    b.z = TriangleShared::Points2D[C].z - TriangleShared::Points2D[A].z;
     return a.CrossProduct(b);
 }
 
 bool TriangleShared::crossedRadius(const TriangleShared& t2) const
 {
     double d;
-    d = (redirectedCenter_3D.x - t2.redirectedCenter_3D.x)*(redirectedCenter_3D.x - t2.redirectedCenter_3D.x)+
-            (redirectedCenter_3D.y - t2.redirectedCenter_3D.y)*(redirectedCenter_3D.y - t2.redirectedCenter_3D.y)+
-            (redirectedCenter_3D.z - t2.redirectedCenter_3D.z)*(redirectedCenter_3D.z - t2.redirectedCenter_3D.z);
+    d = (m_RedirectedCenter3D.x - t2.m_RedirectedCenter3D.x)*(m_RedirectedCenter3D.x - t2.m_RedirectedCenter3D.x)+
+            (m_RedirectedCenter3D.y - t2.m_RedirectedCenter3D.y)*(m_RedirectedCenter3D.y - t2.m_RedirectedCenter3D.y)+
+            (m_RedirectedCenter3D.z - t2.m_RedirectedCenter3D.z)*(m_RedirectedCenter3D.z - t2.m_RedirectedCenter3D.z);
+
     if(d < ( radius + t2.radius ))
         return true;
     return false;
@@ -115,15 +110,15 @@ double TriangleShared::findRadius()
     double tempA=0;
     double tempB=0;
     double tempC=0;
-    tempA=( RedirectPoints[A].x - redirectedCenter_3D.x)*( RedirectPoints[ A].x- redirectedCenter_3D.x)+
-            ( RedirectPoints[A].y- redirectedCenter_3D.y)*( RedirectPoints[ A].y- redirectedCenter_3D.y)+
-            ( RedirectPoints[A].z- redirectedCenter_3D.z)*( RedirectPoints[ A].z- redirectedCenter_3D.z);
-    tempB=( RedirectPoints[B].x- redirectedCenter_3D.x)*( RedirectPoints[ B].x- redirectedCenter_3D.x)+
-            ( RedirectPoints[B].y- redirectedCenter_3D.y)*( RedirectPoints[ B].y- redirectedCenter_3D.y)+
-            ( RedirectPoints[B].z- redirectedCenter_3D.z)*( RedirectPoints[ B].z- redirectedCenter_3D.z);
-    tempC=( RedirectPoints[C].x- redirectedCenter_3D.x)*( RedirectPoints[ C].x- redirectedCenter_3D.x)+
-            ( RedirectPoints[C].y- redirectedCenter_3D.y)*( RedirectPoints[ C].y- redirectedCenter_3D.y)+
-            ( RedirectPoints[C].z- redirectedCenter_3D.z)*( RedirectPoints[ C].z- redirectedCenter_3D.z);
+    tempA=( RedirectPoints[A].x - m_RedirectedCenter3D.x)*( RedirectPoints[ A].x- m_RedirectedCenter3D.x)+
+            ( RedirectPoints[A].y- m_RedirectedCenter3D.y)*( RedirectPoints[ A].y- m_RedirectedCenter3D.y)+
+            ( RedirectPoints[A].z- m_RedirectedCenter3D.z)*( RedirectPoints[ A].z- m_RedirectedCenter3D.z);
+    tempB=( RedirectPoints[B].x- m_RedirectedCenter3D.x)*( RedirectPoints[ B].x- m_RedirectedCenter3D.x)+
+            ( RedirectPoints[B].y- m_RedirectedCenter3D.y)*( RedirectPoints[ B].y- m_RedirectedCenter3D.y)+
+            ( RedirectPoints[B].z- m_RedirectedCenter3D.z)*( RedirectPoints[ B].z- m_RedirectedCenter3D.z);
+    tempC=( RedirectPoints[C].x- m_RedirectedCenter3D.x)*( RedirectPoints[ C].x- m_RedirectedCenter3D.x)+
+            ( RedirectPoints[C].y- m_RedirectedCenter3D.y)*( RedirectPoints[ C].y- m_RedirectedCenter3D.y)+
+            ( RedirectPoints[C].z- m_RedirectedCenter3D.z)*( RedirectPoints[ C].z- m_RedirectedCenter3D.z);
     if(tempA>=tempB){
         if(tempA>=tempC)
             Radius = sqrt(tempA);

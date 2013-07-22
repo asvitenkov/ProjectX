@@ -182,6 +182,12 @@ public:
 		return length;
 	};
 
+
+    T Angle(const ThisType& v) const
+    {
+        return acos( DotProduct(v)/(Length()*v.Length()) );
+    }
+
 	T	DotProduct( const ThisType& v ) const
 	{
         const T ret = this->x * v.x + this->y * v.y + this->z * v.z;

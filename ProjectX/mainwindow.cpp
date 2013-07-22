@@ -24,9 +24,6 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     ui->originalViewTab->setLayout(new QHBoxLayout());
     ui->originalViewTab->layout()->addWidget(&inputModelMaker);
-#ifndef win32
-    ui->originalViewTab->layout()->addWidget(&outputModelMaker);
-#endif
 
     connect(ui->actionOpen, SIGNAL(triggered()),
             this, SLOT(openHandler()));
@@ -62,7 +59,7 @@ void MainWindow::openHandler()
             disconnect(alg, SIGNAL(statusChanged(QString)));
 
             inputModelMaker.getModelMaker().setPoints(0x0);
-            inputModelMaker.getModelMaker().setTriangles(QVector<triangle_t>());
+            inputModelMaker.getModelMaker().setTriangles(QVector<TriangleShared>());
             delete alg;
         }
 
@@ -72,7 +69,7 @@ void MainWindow::openHandler()
         connect(alg, SIGNAL(statusChanged(QString)), this, SLOT(stateChanged(QString)), Qt::QueuedConnection);
 
         alg->readMailFile(filename.toStdString().data());
-        inputModelMaker.getModelMaker().setPoints(&alg->points_3D);
+        inputModelMaker.getModelMaker().setPoints(&TriangleShared::Points3D);
         inputModelMaker.getModelMaker().setTriangles(alg->srcTriangles);
     }
     else
@@ -96,11 +93,9 @@ void MainWindow::processHandler()
 
     QDate startDate = QDate::currentDate();
 
-    polarVector polVec;
+    TVector polVec;
 
-    polVec.r = 1;
-    polVec.te = ui->aSpinBox->value();
-    polVec.fi = ui->fiSphinBox->value();
+    polVec.Set(ui->aSpinBox->value()*M_PI/180, ui->fiSphinBox->value()*M_PI/180, 1);
 
     alg->setPolVector(polVec);
 
@@ -108,7 +103,7 @@ void MainWindow::processHandler()
     pthread->start();
 
     inputModelMaker.getModelMaker().setDrawNormal(true);
-    inputModelMaker.getModelMaker().setNormal(ui->aSpinBox->value(), ui->fiSphinBox->value());
+    inputModelMaker.getModelMaker().setNormal(polVec.Theta(), polVec.Phi());
 }
 
 void MainWindow::procesBorderLinesFile(QString filename)
@@ -116,7 +111,7 @@ void MainWindow::procesBorderLinesFile(QString filename)
     EdgeSelector selector;
     try {
         selector.readFile(filename.toStdString().data());
-        QVector<unsigned int> edgePoints = selector.findEdgePoints(alg->points_3D);
+        QVector<unsigned int> edgePoints = selector.findEdgePoints(TriangleShared::Points3D);
         qDebug() << "Selected " << edgePoints.size() << " points";
         QMessageBox::information(this, tr("Information"), tr("Border selecting done. Selected: ")
                                  + QString::number(edgePoints.size()) +" points.");
@@ -156,13 +151,8 @@ void MainWindow::processStatusChanged(int x)
 
     if(x > 10)
     {
-#ifdef win32
-        inputModelMaker.getModelMaker().setPoints(&alg->points_3D);
+        inputModelMaker.getModelMaker().setPoints(&TriangleShared::Points3D);
         inputModelMaker.getModelMaker().setTriangles(alg->outTriangles);
-#else
-        outputModelMaker.getModelMaker().setPoints(&alg->points_3D);
-        outputModelMaker.getModelMaker().setTriangles(alg->outTriangles);
-#endif
         this->setCursor(Qt::ArrowCursor);
     }
 }

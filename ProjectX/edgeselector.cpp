@@ -1,3 +1,4 @@
+
 #include "edgeselector.h"
 
 #include <fstream>
@@ -23,16 +24,16 @@ QVector<unsigned int> EdgeSelector::findEdgePoints(const QVector<TPoint3> &srcPo
         {
 
             double x = points[i].x;
-            double x1 = points[lines[j].A].x;
-            double x2 = points[lines[j].B].x;
+            double x1 = points[lines[j].a].x;
+            double x2 = points[lines[j].b].x;
 
             double y = points[i].y;
-            double y1 = points[lines[j].A].y;
-            double y2 = points[lines[j].B].y;
+            double y1 = points[lines[j].a].y;
+            double y2 = points[lines[j].b].y;
 
             double z = points[i].z;
-            double z1 = points[lines[j].A].z;
-            double z2 = points[lines[j].B].z;
+            double z1 = points[lines[j].a].z;
+            double z2 = points[lines[j].b].z;
 
             double f1 = (x-x1)*(y2-y1)*(z2-z1);
             double f2 = (y-y1)*(x2-x1)*(z2-z1);
@@ -90,9 +91,9 @@ void EdgeSelector::readFile(const char *path)
             double a = lineExp.cap(2).toInt()-1;
             double b = lineExp.cap(3).toInt()-1;
 
-            struct line currentLine;
-            currentLine.A = a;
-            currentLine.B = b;
+            LineShared currentLine;
+            currentLine.a = a;
+            currentLine.a = b;
             lines.push_back(currentLine);
 
             std::cout << "Parsed line " << num << " point " << a << " " << b << std::endl;

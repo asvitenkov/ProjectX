@@ -21,28 +21,24 @@ SOURCES += main.cpp\
         triangles/exception.cpp \
         edgeselector.cpp \
         processthread.cpp \
-        reditrectthread.cpp \
-        cleanthread.cpp \
         bsp/BSPAlg.cpp \
-        triangles/blockanalizator.cpp \
         Math/TriangleShared.cpp
 
 HEADERS  += mainwindow.h \
             modelmaker.h \
-            triangles/s ucts.h \
             triangles/algs.h \
             modelviewer.h \
             triangles/exception.h \
             edgeselector.h \
             processthread.h \
             bsp/BSPAlg.h \
-            triangles/blockanalizator.h \
             Math/Vector3.hpp \
             Math/Triangle.hpp \
             Math/Point3.hpp \
             Math/Complex.hpp \
             Math/MathDefines.h \
             Math/TriangleShared.h \
+            Math/LineShared.h \
             Calc/ComputeFieldDll.hpp \
             Calc/IComputeField.hpp
 
