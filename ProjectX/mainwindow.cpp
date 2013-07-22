@@ -11,6 +11,7 @@
 #include <QDebug>
 #include <QMessageBox>
 #include <QDate>
+#include "calculatedialog.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -21,6 +22,11 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     ui->originalViewTab->setLayout(new QHBoxLayout());
     ui->originalViewTab->layout()->addWidget(&inputModelMaker);
+
+
+    CalculateDialog *dialog = new CalculateDialog();
+
+    ui->projectionViewWidget->addTab(dialog, tr("Calculate"));
 
     connect(ui->actionOpen, SIGNAL(triggered()),
             this, SLOT(openHandler()));

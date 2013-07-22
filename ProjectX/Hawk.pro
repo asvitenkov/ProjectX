@@ -25,7 +25,8 @@ SOURCES += main.cpp\
         cleanthread.cpp \
         bsp/BSPAlg.cpp \
         triangles/blockanalizator.cpp \
-        Math/TriangleShared.cpp
+        Math/TriangleShared.cpp \
+    calculatedialog.cpp
 
 HEADERS  += mainwindow.h \
             modelmaker.h \
@@ -42,7 +43,8 @@ HEADERS  += mainwindow.h \
             Math/Point3.hpp \
             Math/Complex.hpp \
             Math/MathDefines.h \
-            Math/TriangleShared.h
+            Math/TriangleShared.h \
+    calculatedialog.h
 
 HEADERS  += mainwindow.h \
             modelmaker.h \
@@ -62,7 +64,8 @@ HEADERS  += mainwindow.h \
     Calc/ComputeFieldDll.hpp \
     Calc/IComputeField.hpp
 
-FORMS    += mainwindow.ui
+FORMS    += mainwindow.ui \
+    calculatedialog.ui
 
 LIBS += -L$$PWD/libfortran/ -lRCS_functions_cyl
 INCLUDEPATH += $$PWD/libfortran
