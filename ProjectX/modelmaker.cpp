@@ -24,7 +24,7 @@ ModelMaker::ModelMaker(QWidget *parent) :
     scaling = 1;
 }
 
-void ModelMaker::setTriangles(const QVector<TriangleShared>& t)
+void ModelMaker::setTriangles(const QVector<triangle_t>& t)
 {
     UsingTriangles = t;
     if(UsingTriangles.isEmpty()){
@@ -172,7 +172,7 @@ void ModelMaker::paintGL()
 
     for(int i=0; i<UsingTriangles.size(); i++)
     {
-        TriangleShared t = UsingTriangles.at(i);
+        struct triangle_t t = UsingTriangles.at(i);
 
         qglColor((t.dead)?(Qt::cyan):(Qt::blue));
 

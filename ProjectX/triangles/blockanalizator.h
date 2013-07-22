@@ -3,23 +3,23 @@
 
 #include <QThread>
 #include <QVector>
-#include "Math/TriangleShared.h"
+#include <triangles/structs.h>
 
 class BlockAnalizator : public QThread
 {
     Q_OBJECT
 public:
-    explicit BlockAnalizator(QVector<TriangleShared> & , QVector<TPoint2> *pt, QObject *parent = 0);
+    explicit BlockAnalizator(QVector<triangle_t> &tr, QVector<TPoint2> *pt, QObject *parent = 0);
     void run();
 
 private:
-    QVector<TriangleShared>  triangles;
+    QVector<triangle_t> triangles;
     QVector<TPoint2>* points;
 
-    bool sameTriangle(TriangleShared t1, TriangleShared t2);
-    bool crossedTriangles(TriangleShared t1, TriangleShared t2);
+    bool sameTriangle(triangle_t t1, triangle_t t2);
+    bool crossedTriangles(triangle_t t1, triangle_t t2);
     bool crossedLines(TPoint2 p11, TPoint2 p12, TPoint2 p21, TPoint2 p22);
-    bool crossedRadius(TriangleShared t1, TriangleShared t2);
+    bool crossedRadius(triangle_t t1, triangle_t t2);
 signals:
     
 public slots:

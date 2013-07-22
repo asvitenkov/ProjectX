@@ -36,14 +36,10 @@ public:
 
 	~Point3()
 	{
+		Assign(T(0), T(0), T(0));
 	};
 
-    void Set( T fx, T fy, T fz )
-    {
-        Assign(fx, fy, fz);
-    };
-
-    friend std::ostream& operator << (std::ostream& output, const ThisType& v)
+	friend std::ostream& operator << (std::ostream& output, const ThisType& v)
 	{
 		output << "Point(" << v.x << ", " << v.y << ", " << v.z << ")";
 		return output;
@@ -136,7 +132,7 @@ public:
 	bool operator == ( const ThisType& v ) const
 	{
 		bool bRes 
-            =  abs(x - v.x) < std::numeric_limits<T>::epsilon()
+			=  abs(x - v.x) < std::numeric_limits<T>::epsilon()
 			&& abs(y - v.y) < std::numeric_limits<T>::epsilon()
 			&& abs(z - v.z) < std::numeric_limits<T>::epsilon();
 

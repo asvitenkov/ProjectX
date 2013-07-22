@@ -8,7 +8,6 @@
 #include <math.h>
 #include <limits>
 
-
 template<typename T>
 class Triangle
 {
@@ -17,7 +16,7 @@ public:
 	typedef Point3<T>	PointType;
 	typedef Vec3<T>		VecType;
 
-    Triangle()
+	Triangle()
 	{
         Assign(PointType::Zero, PointType::Zero, PointType::Zero);
 	};
@@ -39,19 +38,14 @@ public:
 
 	~Triangle()
 	{
-
+		Assign(PointType(), PointType(), PointType());
 	};
 
-    void Set( const PointType& fx, const PointType& fy, const PointType& fz )
-    {
-        Assign(fx, fy, fz);
-    };
-
-    friend std::ostream& operator << (std::ostream& output, const ThisType& v)
+	friend std::ostream& operator << (std::ostream& output, const ThisType& v)
 	{
-        output << "Triangle(" << v.p1() << ", " << v.p2() << ", " << v.p3() << ")";
+        output << "Triangle(" << v.p1 << ", " << v.p2 << ", " << v.p3 << ")";
 		return output;
-    };
+	};
 
 	ThisType operator = ( const ThisType& v )
 	{
@@ -134,23 +128,13 @@ public:
 
 	bool operator == ( const ThisType& v ) const
 	{
-        bool bRes
-                =  ((p1() == v.p1()) || (p1() == v.p2()) || (p1() == v.p3()))
-            && ((p2() == v.p1()) || (p2() == v.p2()) || (p2() == v.p3()))
-            && ((p3() == v.p1()) || (p3() == v.p2()) || (p3() == v.p3()));
+		bool bRes 
+			=  ((p1 == v.p1) || (p1 == v.p2) || (p1 == v.p3))
+			&& ((p2 == v.p1) || (p2 == v.p2) || (p2 == v.p3))
+			&& ((p3 == v.p1) || (p3 == v.p2) || (p3 == v.p3));
 
-        return bRes;
+		return bRes; 
 	};
-
-    bool HasSamePoint(const ThisType& v) const
-    {
-        bool bRes
-                =  ((p1() == v.p1()) || (p1() == v.p2()) || (p1() == v.p3()))
-            || ((p2() == v.p1()) || (p2() == v.p2()) || (p2() == v.p3()))
-            || ((p3() == v.p1()) || (p3() == v.p2()) || (p3() == v.p3()));
-
-        return true;
-    }
 
 	VecType Normal() const
 	{

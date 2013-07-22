@@ -3,7 +3,7 @@
 
 #include <QGLWidget>
 #include <QVector>
-#include "Math/TriangleShared.h"
+#include "triangles/structs.h"
 
 #define OFFSET_RATIO 100
 
@@ -14,7 +14,7 @@ public:
     explicit ModelMaker(QWidget *parent = 0);
 
     /* Установка вектора треугольников для прорисовки */
-    void setTriangles(const QVector<TriangleShared>& t);
+    void setTriangles(const QVector<triangle_t>& t);
     /* Установка точек\вершин треугольника */
     void setPoints(QVector<TPoint3> *p);
     /* Установка точек лежащих на гранях для прорисовки */
@@ -57,7 +57,7 @@ private:
 
 
     /* Вектора треугольников, вершин, вершин принадлежащих граням */
-    QVector<TriangleShared> UsingTriangles;
+    QVector<triangle_t> UsingTriangles;
     QVector<TPoint3> *points;
     QVector<unsigned int> borderPointsIndexes;
 
@@ -76,7 +76,7 @@ protected:
     void paintGL();
     /*
      *The resizeGL() function is used to ensure that the OpenGL implementation renders the scene onto a viewport
-     *that matches the size of the widget, using the correct  ansformation from 3D coordinates to 2D
+     *that matches the size of the widget, using the correct transformation from 3D coordinates to 2D
      *viewport coordinates.
      */
     void resizeGL(int width, int height);

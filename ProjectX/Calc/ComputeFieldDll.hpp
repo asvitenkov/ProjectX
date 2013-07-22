@@ -8,6 +8,7 @@
 template<typename T>
 class ComputeFieldDll : public IComputeField<T>
 {
+
     typedef IComputeField<T> BaseClass;
     typedef typename BaseClass::TriangleType TriangleType;
     typedef typename BaseClass::ComplexType ComplexType;
