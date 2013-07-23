@@ -47,13 +47,16 @@ private:
     TVector m_vec;
     std::string status;
     unsigned int checkedTrianglesCount;
+    int m_amout;
 
     void Prepare();
     void Calc(int start, int end);
 
     /* main action groups */
+    void cleanPhase1();
     void cleanPhase2();
-    void killNonShown(int b, int e);
+    void cleanByNormal(int start, int end);
+    void killNonShown(int start, int end);
 
     void FindRadius(const TriangleShared& tr, TriangleDescr& descr);
     void FindDistance(const TriangleShared& tr, TriangleDescr& descr) const;
@@ -72,4 +75,8 @@ signals:
     void statusChanged(QString);
     void processStateChanged(int);
 };
+
+template <typename T> int sgn(T val) {
+    return (T(0) < val) - (val < T(0));
+}
 #endif // ALGS_H

@@ -7,17 +7,20 @@
 #include <ostream>
 #include <cstdlib>
 #include <QVector>
+#include <QTimer>
 #include <cmath>
-#include <ctime>
+
+#include "TimeDiff.h"
 
 #include <QDebug>
 
 Model* Algoritm::manipulate()
 {
-    m_redirectPoints.clear();
-    m_point2D.clear();
-    checkedTrianglesCount = 0x0;
-    time_t start_timestamp = time(NULL);
+    TimeDiff time;
+    time.Start();
+
+    checkedTrianglesCount = 0;
+    m_amout = 0;
 
     //process
     {
@@ -28,9 +31,21 @@ Model* Algoritm::manipulate()
         Prepare();
         Calc(0, m_model->GetTriangles().size());
 
-        emit statusChanged("done\n");
+        emit processStateChanged(10);
+        emit statusChanged("Clean by normal:");
+        emit statusChanged("done. Time: " + QString::number(time.Diff()));
+        emit statusChanged("done. Time: ");
 
-        cleanPhase2();
+        cleanPhase1();
+
+        emit statusChanged("Clean by 2:");
+        emit processStateChanged(50);
+        emit statusChanged("done. Time: " + QString::number(time.Diff()));
+
+        //cleanPhase2();
+        emit statusChanged("Cmp lines" + QString::number(m_amout));
+
+        emit processStateChanged(98);
     }
 
     for(int i=0; i < m_model->GetTriangles().size(); ++i)
@@ -38,14 +53,7 @@ Model* Algoritm::manipulate()
         m_model->GetTriangles()[i].SetVisible(!m_descr[i].IsDead);
     }
 
-    time_t end_timestamp = time(NULL);
-    std::cout << start_timestamp << " " << end_timestamp << std::endl;
-
-    double workTime = difftime(end_timestamp, start_timestamp);
-
-    emit statusChanged("Work time: " +QString::number(workTime) +" s or " +QString::number(workTime/60) +" min");
-    emit statusChanged("Count of projection triangles: " +QString::number(m_model->GetTriangles().size()));
-
+    emit statusChanged("Time: " + QString::number(time.Diff()));
     emit processStateChanged(100);
 
     return m_model;
@@ -61,6 +69,11 @@ void Algoritm::SetSightVector(const TVector &v)
     m_vec = v;
 }
 
+void Algoritm::cleanPhase1()
+{
+    cleanByNormal(0, m_model->GetTriangles().size());
+}
+
 void Algoritm::cleanPhase2()
 {
     //clean - phase 2
@@ -72,7 +85,7 @@ void Algoritm::cleanPhase2()
     emit statusChanged("done\n");
 }
 
-void Algoritm::killNonShown(int start, int end)
+void Algoritm::cleanByNormal(int start, int end)
 {
     const int n = m_model->GetTriangles().size();
 
@@ -83,18 +96,54 @@ void Algoritm::killNonShown(int start, int end)
 
     for(int i = start; i < end; ++i)
     {
-        if(m_descr[i].IsDead == false)
+        TriangleShared& t = m_model->GetTriangles()[i];
+        TVector v1(t.p1()-t.p2());
+        TVector v2(t.p3()-t.p2());
+
+        TVector face(v1.CrossProduct(v2));
+        double distance = -(face.x*v1.x + face.y*v1.y + face.z*v1.z);
+        TPoint3 center =t.Center();
+
+        double m = -sgn(face.x*center.x + face.y*center.y + face.z*center.z + distance);
+
+        face *= m;
+        distance *= m;
+
+        if((face.DotProduct(m_vec)+distance) > -std::numeric_limits<float>::epsilon())
         {
-            for(int j = i+1; j < m_model->GetTriangles().size(); ++j)
+            m_descr[i].IsDead = true;
+        }
+    }
+}
+
+void Algoritm::killNonShown(int start, int end)
+{
+    const int N = m_model->GetTriangles().size();
+
+    if(end > N)
+    {
+        end = N;
+    }
+
+    for(int i = start; i < end; ++i)
+    {
+        if(!m_descr[i].IsDead)
+        {
+            for(int j = i+1; j < N; ++j)
             {
                 if(!HaveSamePoint(m_model->GetTriangles()[j], m_model->GetTriangles()[i]))
                 {
                     if(IsCrossedTriangles(m_model->GetTriangles()[j], m_model->GetTriangles()[i]))
                     {
                         if(m_descr[i].Distance < m_descr[j].Distance)
+                        {
                             m_descr[i].IsDead = true;
+                            break;
+                        }
                         else
+                        {
                             m_descr[j].IsDead= true;
+                        }
                     }
                 }
             }
@@ -107,6 +156,10 @@ void Algoritm::killNonShown(int start, int end)
 void Algoritm::Prepare()
 {
     const size_t N = m_model->GetTriangles().size();
+
+    m_redirectPoints.clear();
+    m_point2D.clear();
+    m_descr.clear();
 
     m_descr.resize(N);
     m_redirectPoints.resize(N);
@@ -235,6 +288,9 @@ bool Algoritm::IsCrossedTriangles(const TriangleShared& t1, const TriangleShared
 
 bool Algoritm::IsCrossedLines(const TPoint2& p11, const TPoint2& p12, const TPoint2& p21, const TPoint2& p22) const
 {
+    Algoritm* NonConstThis = const_cast<Algoritm*>(this);
+    NonConstThis->m_amout++;
+
     double k1 = (p11.y - p12.y)/(p11.x - p12.x);
     double k2 = (p21.y - p22.y)/(p21.x - p22.x);
 

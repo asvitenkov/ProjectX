@@ -23,8 +23,6 @@ void TriangleShared::Set(int _A, int _B, int _C)
     m_A = _A;
     m_B = _B;
     m_C = _C;
-
-    Recalc();
 }
 
 const TPoint3& TriangleShared::p1() const
