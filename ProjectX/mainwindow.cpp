@@ -42,6 +42,11 @@ MainWindow::MainWindow(QWidget *parent) :
     connect( &inputModelMaker.getModelMaker(), SIGNAL(yRotationChanged(int)), this, SLOT(rotationAngleChanged()) );
 
     pthread = new ProcessThread();
+
+
+    ui->aSpinBox->setMaximum(90.0);
+    ui->aSpinBox->setMinimum(-90.0);
+    ui->fiSphinBox->setMaximum(360.0);
 }
 
 MainWindow::~MainWindow()
