@@ -10,10 +10,10 @@ class BSPAlg : public QObject
 {
     Q_OBJECT
 public:
-    explicit BSPAlg(QVector<TriangleShared>*  iangles, QVector<TPoint3>* points, QObject *parent = 0);
+    explicit BSPAlg(QVector<TriangleShared>* triangles, QVector<TPoint3>* points, QObject *parent = 0);
 
 private:
-    QVector<TriangleShared> * iangles;
+    QVector<TriangleShared> *triangles;
     QVector<TPoint3> *points;
 
     void split();

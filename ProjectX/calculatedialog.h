@@ -34,6 +34,9 @@ private:
 
     Ui::CalculateDialog *ui;
     QMap<QString,EConduction::TYPE> mMaterial;
+
+protected slots:
+    void OnBtnCalculate();
 };
 
 #endif // CALCULATEDIALOG_H

@@ -45,6 +45,9 @@ void CalculateDialog::InitDialog()
     for(int i=0; i<mapKeys.size(); ++i)
         ui->cmbbxMaterial->addItem(mapKeys[i]);
 
+
+    connect(ui->btnCalculate,SIGNAL(clicked()),this,SLOT(OnBtnCalculate()));
+
 }
 
 double CalculateDialog::Wavenumber()
@@ -91,4 +94,12 @@ void CalculateDialog::SetE1(const TComplex &value)
 void CalculateDialog::SetMaterial(const EConduction::TYPE &value)
 {
     ui->cmbbxMaterial->setCurrentIndex(ui->cmbbxMaterial->findText(EConductionToString(value)));
+}
+
+
+
+void CalculateDialog::OnBtnCalculate()
+{
+    // Process calculate
+
 }

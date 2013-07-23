@@ -10,6 +10,6 @@ void BSPAlg::makeTree()
 }
 
 
-BSPAlg::BSPAlg(QVector<TriangleShared> * iangles, QVector<TPoint3> *points, QObject *parent)
+BSPAlg::BSPAlg(QVector<TriangleShared> *triangles, QVector<TPoint3> *points, QObject *parent)
 {
 }

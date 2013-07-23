@@ -17,7 +17,7 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
-    ModelViewer inputModelMaker;
+    ModelViewer inputModelMaker, outputModelMaker;
 private:
     QVector<TriangleShared> triangles;
     Ui::MainWindow *ui;

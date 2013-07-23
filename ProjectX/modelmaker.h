@@ -3,6 +3,7 @@
 
 #include <QGLWidget>
 #include <QVector>
+
 #include "Math/TriangleShared.h"
 
 #define OFFSET_RATIO 100
@@ -76,7 +77,7 @@ protected:
     void paintGL();
     /*
      *The resizeGL() function is used to ensure that the OpenGL implementation renders the scene onto a viewport
-     *that matches the size of the widget, using the correct  ansformation from 3D coordinates to 2D
+     *that matches the size of the widget, using the correct transformation from 3D coordinates to 2D
      *viewport coordinates.
      */
     void resizeGL(int width, int height);

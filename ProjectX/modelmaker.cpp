@@ -35,19 +35,19 @@ void ModelMaker::setTriangles(const QVector<TriangleShared>& t)
     TPoint3 p;
     for(int i=0; i<UsingTriangles.size(); i++)
     {
-        p = getPointFun(UsingTriangles.at(i).A);
+        p = UsingTriangles[i].p1();
         this->max = qMax(p.x, this->max);
         this->max = qMax(p.y, this->max);
         this->max = qMax(p.z, this->max);
 
-        p = getPointFun(UsingTriangles.at(i).B);
+        p = UsingTriangles[i].p2();
         this->max = qMax(p.x, this->max);
         this->max = qMax(p.y, this->max);
         this->max = qMax(p.z, this->max);
 
-        this->max = qMax(getPointFun(UsingTriangles.at(i).C).x, this->max);
-        this->max = qMax(getPointFun(UsingTriangles.at(i).C).y, this->max);
-        this->max = qMax(getPointFun(UsingTriangles.at(i).C).z, this->max);
+        this->max = qMax(UsingTriangles[i].p3().x, this->max);
+        this->max = qMax(UsingTriangles[i].p3().y, this->max);
+        this->max = qMax(UsingTriangles[i].p3().z, this->max);
     }
     updateGL();
 }
@@ -172,19 +172,19 @@ void ModelMaker::paintGL()
 
     for(int i=0; i<UsingTriangles.size(); i++)
     {
-        TriangleShared t = UsingTriangles.at(i);
+        TriangleShared& t = UsingTriangles[i];
 
         qglColor((t.dead)?(Qt::cyan):(Qt::blue));
 
         glBegin(GL_LINE_STRIP);
-        glVertex3d((GLdouble) (getPointFun(t.A).x/max),
-                   (GLdouble) (getPointFun(t.A).y / max), (GLdouble) (getPointFun(t.A).z / max));
-        glVertex3d((GLdouble) (getPointFun(t.B).x/max),
-                   (GLdouble) (getPointFun(t.B).y / max), (GLdouble) (getPointFun(t.B).z / max));
-        glVertex3d((GLdouble) (getPointFun(t.C).x/max),
-                   (GLdouble) (getPointFun(t.C).y / max), (GLdouble) (getPointFun(t.C).z / max));
-        glVertex3d((GLdouble) (getPointFun(t.A).x/max),
-                   (GLdouble) (getPointFun(t.A).y / max), (GLdouble) (getPointFun(t.A).z / max));
+        glVertex3d((GLdouble) (t.p1().x/max),
+                   (GLdouble) (t.p1().y / max), (GLdouble) (t.p1().z / max));
+        glVertex3d((GLdouble) (t.p2().x/max),
+                   (GLdouble) (t.p2().y / max), (GLdouble) (t.p2().z / max));
+        glVertex3d((GLdouble) (t.p3().x/max),
+                   (GLdouble) (t.p3().y / max), (GLdouble) (t.p3().z / max));
+        glVertex3d((GLdouble) (t.p1().x/max),
+                   (GLdouble) (t.p1().y / max), (GLdouble) (t.p1().z / max));
         glEnd();
     }
     drawBorderPoints();

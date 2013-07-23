@@ -13,6 +13,9 @@
 #include <QDate>
 #include "calculatedialog.h"
 
+#define win32 true
+
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
@@ -59,7 +62,7 @@ void MainWindow::openHandler()
     {
         if(alg != 0x0) {
             disconnect(alg, SIGNAL(processStateChanged(int)));
-            disconnect(alg, SIGNAL(statusChanged(QS ing)));
+            disconnect(alg, SIGNAL(statusChanged(QString)));
 
             inputModelMaker.getModelMaker().setPoints(0x0);
             inputModelMaker.getModelMaker().setTriangles(QVector<TriangleShared>());
@@ -72,7 +75,7 @@ void MainWindow::openHandler()
         connect(alg, SIGNAL(statusChanged(QString)), this, SLOT(stateChanged(QString)), Qt::QueuedConnection);
 
         alg->readMailFile(filename.toStdString().data());
-        inputModelMaker.getModelMaker().setPoints(&TriangleShared::Points);
+        inputModelMaker.getModelMaker().setPoints(&TriangleShared::Points3D);
         inputModelMaker.getModelMaker().setTriangles(alg->srcTriangles);
     }
     else
@@ -81,7 +84,7 @@ void MainWindow::openHandler()
             procesBorderLinesFile(filename);
         else
         {
-            QMessageBox::warning(this,  ("Warning"), "Open please mail file for first");
+            QMessageBox::warning(this, tr("Warning"), "Open please mail file for first");
             return;
         }
     }
@@ -90,7 +93,7 @@ void MainWindow::openHandler()
 void MainWindow::processHandler()
 {
     if(alg->srcTriangles.size() == 0 )
-        QMessageBox::warning(this,  ("Warning"),  ("Empty  iangles array"));
+        QMessageBox::warning(this, tr("Warning"), tr("Empty triangles array"));
 
     this->setCursor(Qt::WaitCursor);
 
@@ -98,15 +101,15 @@ void MainWindow::processHandler()
 
     TVector polVec;
 
-    polVec.Set(ui->aSpinBox->value(), ui->fiSphinBox->value(), 1);
+    polVec.Set(ui->aSpinBox->value()*M_PI/180, ui->fiSphinBox->value()*M_PI/180, 1);
 
-    alg->SetViewVector(polVec);
+    alg->setPolVector(polVec);
 
     pthread->setAlgs(alg);
     pthread->start();
 
     inputModelMaker.getModelMaker().setDrawNormal(true);
-    inputModelMaker.getModelMaker().setNormal(ui->aSpinBox->value(), ui->fiSphinBox->value());
+    inputModelMaker.getModelMaker().setNormal(polVec.Theta(), polVec.Phi());
 }
 
 void MainWindow::procesBorderLinesFile(QString filename)
@@ -114,9 +117,9 @@ void MainWindow::procesBorderLinesFile(QString filename)
     EdgeSelector selector;
     try {
         selector.readFile(filename.toStdString().data());
-        QVector<unsigned int> edgePoints = selector.findEdgePoints(TriangleShared::Points);
+        QVector<unsigned int> edgePoints = selector.findEdgePoints(TriangleShared::Points3D);
         qDebug() << "Selected " << edgePoints.size() << " points";
-        QMessageBox::information(this,  ("Information"),  ("Border selecting done. Selected: ")
+        QMessageBox::information(this, tr("Information"), tr("Border selecting done. Selected: ")
                                  + QString::number(edgePoints.size()) +" points.");
 
         inputModelMaker.getModelMaker().setBorderPointsIndexes(edgePoints);
@@ -128,7 +131,7 @@ void MainWindow::procesBorderLinesFile(QString filename)
 
 void MainWindow::saveHandler()
 {
-    QString filePath = QFileDialog::getSaveFileName(this, "Saving  iangles file", QDir::homePath(), "Triangles file (*.mail)");
+    QString filePath = QFileDialog::getSaveFileName(this, "Saving triangles file", QDir::homePath(), "Triangles file (*.mail)");
     if(filePath.isEmpty())
         return;
     this->setCursor(Qt::WaitCursor);
@@ -154,7 +157,7 @@ void MainWindow::processStatusChanged(int x)
 
     if(x > 10)
     {
-        inputModelMaker.getModelMaker().setPoints(&TriangleShared::Points);
+        inputModelMaker.getModelMaker().setPoints(&TriangleShared::Points3D);
         inputModelMaker.getModelMaker().setTriangles(alg->outTriangles);
         this->setCursor(Qt::ArrowCursor);
     }
