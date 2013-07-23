@@ -2,7 +2,7 @@
 #define PROCESSTHREAD_H
 
 #include <QThread>
-#include "triangles/algs.h"
+#include "Algo/Algoritm.h"
 
 class ProcessThread : public QThread
 {

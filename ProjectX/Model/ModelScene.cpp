@@ -1,4 +1,4 @@
-#include "modelmaker.h"
+#include "ModelScene.h"
 #include "math.h"
 #include <QDebug>
 #include <QMouseEvent>
@@ -12,7 +12,7 @@ static void qNormalizeAngle(int &angle)
 
 }
 
-ModelMaker::ModelMaker(QWidget *parent) :
+ModelScene::ModelScene(QWidget *parent) :
     QGLWidget(parent), xOffset(0), yOffset(0)
 {
     xRot = 0;
@@ -22,80 +22,97 @@ ModelMaker::ModelMaker(QWidget *parent) :
     drawNormal = false;
 
     scaling = 1;
+
+    m_model = new Model();
 }
 
-void ModelMaker::setTriangles(const QVector<TriangleShared>& t)
+ModelScene::~ModelScene()
 {
-    UsingTriangles = t;
-    if(UsingTriangles.isEmpty()){
-        updateGL();
-        return;
-    }
-
-    TPoint3 p;
-    for(int i=0; i<UsingTriangles.size(); i++)
+    if(m_model)
     {
-        p = UsingTriangles[i].p1();
-        this->max = qMax(p.x, this->max);
-        this->max = qMax(p.y, this->max);
-        this->max = qMax(p.z, this->max);
-
-        p = UsingTriangles[i].p2();
-        this->max = qMax(p.x, this->max);
-        this->max = qMax(p.y, this->max);
-        this->max = qMax(p.z, this->max);
-
-        this->max = qMax(UsingTriangles[i].p3().x, this->max);
-        this->max = qMax(UsingTriangles[i].p3().y, this->max);
-        this->max = qMax(UsingTriangles[i].p3().z, this->max);
+        delete m_model;
     }
+}
+
+void ModelScene::SetModel(Model* model)
+{
+    if(m_model)
+    {
+        delete m_model;
+    }
+
+    m_model = model;
+    OnChange();
+}
+
+
+void ModelScene::Update()
+{
     updateGL();
 }
 
-void ModelMaker::setPoints(QVector<TPoint3> *p)
+void ModelScene::FindMax()
 {
-    points = p;
+    for(int i=0; i<m_model->GetTriangles().size(); i++)
+    {
+        const TPoint3& p1 = m_model->GetTriangles()[i].p1();
+        const TPoint3& p2 = m_model->GetTriangles()[i].p2();
+        const TPoint3& p3 = m_model->GetTriangles()[i].p3();
+
+        this->max = qMax(p1.x, this->max);
+        this->max = qMax(p1.y, this->max);
+        this->max = qMax(p1.z, this->max);
+
+        this->max = qMax(p2.x, this->max);
+        this->max = qMax(p2.y, this->max);
+        this->max = qMax(p2.z, this->max);
+
+        this->max = qMax(p3.x, this->max);
+        this->max = qMax(p3.y, this->max);
+        this->max = qMax(p3.z, this->max);
+    }
 }
 
-void ModelMaker::setBorderPointsIndexes(QVector<unsigned int> &indexes)
+void ModelScene::OnChange()
+{
+    FindMax();
+    updateGL();
+}
+
+void ModelScene::setBorderPointsIndexes(QVector<unsigned int> &indexes)
 {
     borderPointsIndexes = indexes;
     updateGL();
 }
 
-void ModelMaker::setMax(double _max)
-{
-    max = _max;
-}
-
-int ModelMaker::getXRot()
+int ModelScene::getXRot()
 {
     return xRot;
 }
 
-int ModelMaker::getYRot()
+int ModelScene::getYRot()
 {
     return yRot;
 }
 
-int ModelMaker::getZRot()
+int ModelScene::getZRot()
 {
     return zRot;
 }
 
-void ModelMaker::setNormal(double _tetta, double _fi)
+void ModelScene::setNormal(double _tetta, double _fi)
 {
     tetta = _tetta;
     fi = _fi;
     updateGL();
 }
 
-void ModelMaker::setDrawNormal(const bool enable)
+void ModelScene::setDrawNormal(const bool enable)
 {
     drawNormal = enable;
 }
 
-void ModelMaker::drawAxis()
+void ModelScene::drawAxis()
 {
 
     //draw axis
@@ -120,7 +137,7 @@ void ModelMaker::drawAxis()
     glEnd();
 }
 
-void ModelMaker::drawBorderPoints()
+void ModelScene::drawBorderPoints()
 {
     if(borderPointsIndexes.size() <  0)
         return;
@@ -139,16 +156,16 @@ void ModelMaker::drawBorderPoints()
     }
 }
 
-TPoint3 ModelMaker::getPointFun(int index)
+TPoint3 ModelScene::getPointFun(int index)
 {
     return points->at(index);
 }
 
-void ModelMaker::initializeGL()
+void ModelScene::initializeGL()
 {
 }
 
-void ModelMaker::paintGL()
+void ModelScene::paintGL()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
@@ -170,11 +187,12 @@ void ModelMaker::paintGL()
     glLineWidth(1.0);
     glScalef(scaling, scaling, scaling);
 
-    for(int i=0; i<UsingTriangles.size(); i++)
+    for(int i=0; i<m_model->m_triangles.size(); i++)
     {
-        TriangleShared& t = UsingTriangles[i];
+        TriangleShared& t = m_model->m_triangles[i];
 
-        qglColor((t.dead)?(Qt::cyan):(Qt::blue));
+        if(!t.IsVisible())
+            continue;
 
         glBegin(GL_LINE_STRIP);
         glVertex3d((GLdouble) (t.p1().x/max),
@@ -191,7 +209,7 @@ void ModelMaker::paintGL()
     drawAxis();
 }
 
-void ModelMaker::resizeGL(int width, int height)
+void ModelScene::resizeGL(int width, int height)
 {
     glViewport(0, 0, width, height);
     glMatrixMode(GL_PROJECTION);
@@ -206,12 +224,12 @@ void ModelMaker::resizeGL(int width, int height)
 
 }
 
-void ModelMaker::mousePressEvent(QMouseEvent *event)
+void ModelScene::mousePressEvent(QMouseEvent *event)
 {
     lastPos = event->pos();
 }
 
-void ModelMaker::mouseMoveEvent(QMouseEvent *event)
+void ModelScene::mouseMoveEvent(QMouseEvent *event)
 {
     int dx = event->x() - lastPos.x();
     int dy = event->y() - lastPos.y();
@@ -226,7 +244,7 @@ void ModelMaker::mouseMoveEvent(QMouseEvent *event)
     lastPos = event->pos();
 }
 
-void ModelMaker::setXRotation(int angle)
+void ModelScene::setXRotation(int angle)
 {
     qNormalizeAngle(angle);
 
@@ -237,7 +255,7 @@ void ModelMaker::setXRotation(int angle)
     }
 }
 
-void ModelMaker::setYRotation(int angle)
+void ModelScene::setYRotation(int angle)
 {
     qNormalizeAngle(angle);
 
@@ -248,7 +266,7 @@ void ModelMaker::setYRotation(int angle)
     }
 }
 
-void ModelMaker::setZRotation(int angle)
+void ModelScene::setZRotation(int angle)
 {
     qNormalizeAngle(angle);
 
@@ -259,19 +277,19 @@ void ModelMaker::setZRotation(int angle)
     }
 }
 
-void ModelMaker::setScaling(int _scaling)
+void ModelScene::setScaling(int _scaling)
 {
     scaling = ( _scaling ) / 100.0;
     updateGL();
 }
 
-void ModelMaker::setXOffset(int x)
+void ModelScene::setXOffset(int x)
 {
     xOffset = (double) x / OFFSET_RATIO;
     updateGL();
 }
 
-void ModelMaker::setYOffset(int y)
+void ModelScene::setYOffset(int y)
 {
     yOffset = (float) y / OFFSET_RATIO;
     updateGL();

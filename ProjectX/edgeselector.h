@@ -4,7 +4,7 @@
 #include "Math/MathDefines.h"
 
 #include <QVector>
-#include "triangles/exception.h"
+#include "Algo/exception.h"
 
 #define ACCURACY 0.000001
 #define DABS(x) (x>0)?(x):(-x)

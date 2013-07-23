@@ -1,7 +1,7 @@
 #ifndef BSPALG_H
 #define BSPALG_H
 
-#include "Math/TriangleShared.h"
+#include "Model/TriangleShared.h"
 
 #include <QVector>
 #include <QObject>
