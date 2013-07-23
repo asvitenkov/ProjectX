@@ -4,61 +4,56 @@
 #include <QGLWidget>
 #include <QVector>
 
-#include "Math/TriangleShared.h"
+#include "Model/TriangleShared.h"
+#include "Model/Model.h"
 
 #define OFFSET_RATIO 100
 
-class ModelMaker : public QGLWidget
+class ModelScene : public QGLWidget
 {
     Q_OBJECT
+    friend class Model;
 public:
-    explicit ModelMaker(QWidget *parent = 0);
+    explicit ModelScene(QWidget *parent = 0);
+    ~ModelScene();
 
-    /* Установка вектора треугольников для прорисовки */
-    void setTriangles(const QVector<TriangleShared>& t);
-    /* Установка точек\вершин треугольника */
-    void setPoints(QVector<TPoint3> *p);
-    /* Установка точек лежащих на гранях для прорисовки */
+    void Update();
+    void SetModel(Model* model);
     void setBorderPointsIndexes(QVector<unsigned int> &indexes);
-    /* Установка максимального значения координат при прорисовке */
-    void setMax(double _max);
 
-    //получение угла поворота относительно осей
     int getXRot();
     int getYRot();
     int getZRot();
-    //установка координат нормали, с которой происходит просмотр
     void setNormal(double tetta, double fi);
-    //установка разрешения прорисовки нормали
     void setDrawNormal(const bool enable);
 
 private:
-    /* Прорисовка  координатных осей */
     void drawAxis();
-    /* Прорисовка точек лежащих на гранях */
+
     void drawBorderPoints();
 
-    /* Коэффициенты поворота по осям */
+
     int xRot;
     int yRot;
     int zRot;
 
-    /* Коэффициент сдвига центра по осям Ox и Oy */
+
     float xOffset;
     float yOffset;
-    /* Координаты нормали зрения */
+
     double tetta;
     double fi;
-    /* Флаг разрешения прорисовки нормали */
+
     bool drawNormal;
 
-    /* Коэффициент маштаба */
     double scaling;
     double max;
 
+    Model* m_model;
 
-    /* Вектора треугольников, вершин, вершин принадлежащих граням */
-    QVector<TriangleShared> UsingTriangles;
+    void OnChange();
+    void FindMax();
+
     QVector<TPoint3> *points;
     QVector<unsigned int> borderPointsIndexes;
 

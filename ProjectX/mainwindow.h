@@ -2,9 +2,12 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include "modelviewer.h"
+
 #include "processthread.h"
-#include "triangles/algs.h"
+#include "Algo/Algoritm.h"
+
+#include "Model/ModelView.h"
+#include "Model/Model.h"
 
 namespace Ui {
 class MainWindow;
@@ -17,28 +20,24 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
-    ModelViewer inputModelMaker, outputModelMaker;
+    ModelView m_view, outputModelMaker;
+
 private:
     QVector<TriangleShared> triangles;
     Ui::MainWindow *ui;
     QVector<TriangleShared> data;
-    Algoritm *alg;
+    Algoritm *m_algo;
     ProcessThread *pthread;
 
+    Model* m_model;
+
 public slots:
-    /* Обработка открытых файлов */
     void openHandler();
-    /* Процес обработки проекции */
     void processHandler();
-    /* Поиск вершин, принадлежащих граням */
     void procesBorderLinesFile(QString filePath);
-    /* Сохранение файла */
     void saveHandler();
-    /* Угол поворота изменен */
     void rotationAngleChanged();
-    /*Изменен статус работы*/
     void stateChanged(QString state);
-    /*Изменился процент выполнения*/
     void processStatusChanged(int);
 };
 

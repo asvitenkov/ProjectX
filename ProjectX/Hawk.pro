@@ -15,20 +15,18 @@ QMAKE_CFLAGS_DEBUG += -Itriangles
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-        modelmaker.cpp \
-        triangles/algs.cpp \
-        modelviewer.cpp \
-        triangles/exception.cpp \
+        Algo/exception.cpp \
         edgeselector.cpp \
         processthread.cpp \
         bsp/BSPAlg.cpp \
-        Math/TriangleShared.cpp
+        Model/TriangleShared.cpp \
+        Model/Model.cpp \
+        Model/ModelView.cpp \
+        Model/ModelScene.cpp \
+    Algo/Algoritm.cpp
 
 HEADERS  += mainwindow.h \
-            modelmaker.h \
-            triangles/algs.h \
-            modelviewer.h \
-            triangles/exception.h \
+            Algo/exception.h \
             edgeselector.h \
             processthread.h \
             bsp/BSPAlg.h \
@@ -37,10 +35,14 @@ HEADERS  += mainwindow.h \
             Math/Point3.hpp \
             Math/Complex.hpp \
             Math/MathDefines.h \
-            Math/TriangleShared.h \
             Math/LineShared.h \
+            Model/TriangleShared.h \
             Calc/ComputeFieldDll.hpp \
-            Calc/IComputeField.hpp
+            Calc/IComputeField.hpp \
+            Model/Model.h \
+            Model/ModelView.h \
+            Model/ModelScene.h \
+    Algo/Algoritm.h
 
 FORMS    += mainwindow.ui
 

@@ -1,8 +1,10 @@
-#include "modelviewer.h"
+#include "ModelView.h"
+#include "ModelScene.h"
 #include <QSlider>
 #include <QHBoxLayout>
 
-ModelViewer::ModelViewer(QWidget* widget): QWidget(widget),   modelMaker()
+ModelView::ModelView(QWidget* widget)
+    : QWidget(widget)
 {
     QSlider *xSlider = new QSlider(Qt::Vertical);
     QSlider *ySlider = new QSlider(Qt::Vertical);
@@ -10,6 +12,8 @@ ModelViewer::ModelViewer(QWidget* widget): QWidget(widget),   modelMaker()
     QSlider *sSlider = new QSlider(Qt::Vertical);
     QSlider *axSlider = new QSlider(Qt::Vertical);
     QSlider *aySlider = new QSlider(Qt::Vertical);
+
+    m_scene = new ModelScene();
 
     xSlider->setStyleSheet("QSlider { background-color: #33aa33; }");
     ySlider->setStyleSheet("QSlider { background-color: #aa3333; }");
@@ -30,32 +34,30 @@ ModelViewer::ModelViewer(QWidget* widget): QWidget(widget),   modelMaker()
     aySlider->setMaximum(100);
     aySlider->setValue(0);
 
-
     this->setLayout(new QHBoxLayout());
     this->layout()->addWidget(axSlider);
     this->layout()->addWidget(aySlider);
 
-    this->layout()->addWidget(&modelMaker);
+    this->layout()->addWidget(m_scene);
     this->layout()->addWidget(xSlider);
     this->layout()->addWidget(ySlider);
     this->layout()->addWidget(zSlider);
     this->layout()->addWidget(sSlider);
 
-    connect(xSlider, SIGNAL(valueChanged(int)), &modelMaker, SLOT(setXRotation(int)));
-    connect(ySlider, SIGNAL(valueChanged(int)), &modelMaker, SLOT(setYRotation(int)));
-    connect(zSlider, SIGNAL(valueChanged(int)), &modelMaker, SLOT(setZRotation(int)));
-    connect(sSlider, SIGNAL(valueChanged(int)), &modelMaker, SLOT(setScaling(int)));
+    connect(xSlider, SIGNAL(valueChanged(int)), m_scene, SLOT(setXRotation(int)));
+    connect(ySlider, SIGNAL(valueChanged(int)), m_scene, SLOT(setYRotation(int)));
+    connect(zSlider, SIGNAL(valueChanged(int)), m_scene, SLOT(setZRotation(int)));
+    connect(sSlider, SIGNAL(valueChanged(int)), m_scene, SLOT(setScaling(int)));
 
-    connect(&modelMaker, SIGNAL(xRotationChanged(int)), xSlider, SLOT(setValue(int)));
-    connect(&modelMaker, SIGNAL(yRotationChanged(int)), ySlider, SLOT(setValue(int)));
-    connect(&modelMaker, SIGNAL(zRotationChanged(int)), zSlider, SLOT(setValue(int)));
+    connect(m_scene, SIGNAL(xRotationChanged(int)), xSlider, SLOT(setValue(int)));
+    connect(m_scene, SIGNAL(yRotationChanged(int)), ySlider, SLOT(setValue(int)));
+    connect(m_scene, SIGNAL(zRotationChanged(int)), zSlider, SLOT(setValue(int)));
 
-
-    connect(axSlider, SIGNAL(valueChanged(int)), &modelMaker, SLOT(setXOffset(int)));
-    connect(aySlider, SIGNAL(valueChanged(int)), &modelMaker, SLOT(setYOffset(int)));
+    connect(axSlider, SIGNAL(valueChanged(int)), m_scene, SLOT(setXOffset(int)));
+    connect(aySlider, SIGNAL(valueChanged(int)), m_scene, SLOT(setYOffset(int)));
 }
 
-ModelMaker &ModelViewer::getModelMaker()
+ModelScene* ModelView::GetModelScene()
 {
-    return modelMaker;
+    return m_scene;
 }
