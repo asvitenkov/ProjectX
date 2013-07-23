@@ -11,6 +11,7 @@
 #include <QDebug>
 #include <QMessageBox>
 #include <QDate>
+#include "calculatedialog.h"
 
 #define win32 true
 
@@ -25,6 +26,11 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->originalViewTab->setLayout(new QHBoxLayout());
     ui->originalViewTab->layout()->addWidget(&inputModelMaker);
 
+
+    CalculateDialog *dialog = new CalculateDialog();
+
+    ui->projectionViewWidget->addTab(dialog, tr("Calculate"));
+
     connect(ui->actionOpen, SIGNAL(triggered()),
             this, SLOT(openHandler()));
     connect(ui->showButton, SIGNAL(clicked()), this, SLOT(processHandler()));
@@ -36,6 +42,11 @@ MainWindow::MainWindow(QWidget *parent) :
     connect( &inputModelMaker.getModelMaker(), SIGNAL(yRotationChanged(int)), this, SLOT(rotationAngleChanged()) );
 
     pthread = new ProcessThread();
+
+
+    ui->aSpinBox->setMaximum(90.0);
+    ui->aSpinBox->setMinimum(-90.0);
+    ui->fiSphinBox->setMaximum(360.0);
 }
 
 MainWindow::~MainWindow()
