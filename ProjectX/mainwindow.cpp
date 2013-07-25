@@ -45,8 +45,10 @@ MainWindow::MainWindow(QWidget *parent)
     pthread = new ProcessThread();
 
 
-    ui->aSpinBox->setMaximum(90.0);
-    ui->aSpinBox->setMinimum(-90.0);
+
+    ui->aSpinBox->setMinimum(0);
+    ui->aSpinBox->setMaximum(360);
+    ui->fiSphinBox->setMinimum(0);
     ui->fiSphinBox->setMaximum(360.0);
 }
 
