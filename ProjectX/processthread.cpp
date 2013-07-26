@@ -7,7 +7,7 @@ ProcessThread::ProcessThread(QObject *parent) :
 
 void ProcessThread::run()
 {
-    alg->manipulate();
+    alg->Calculate();
 }
 
 void ProcessThread::setAlgs(Algoritm *alg)

@@ -21,31 +21,16 @@ public:
     const TPoint3& p3() const;
     const TPoint3& p2() const;
 
-    const int& A() const;
-    const int& B() const;
-    const int& C() const;
+    inline const int& A() const {return m_A;}
+    inline const int& B() const {return m_B;}
+    inline const int& C() const {return m_C;}
 
     void SetVisible(bool visible) {m_Visible = visible;}
     bool IsVisible() const {return m_Visible;}
 
-
-    TVector Normal() const
-    {
-        double xx = p1().y * p2().z - p1().z * p2().y;
-        double yy = p1().z * p2().x - p1().x * p2().z;
-        double zz = p1().x * p2().y - p1().y * p2().x;
-
-        return TVector(xx, yy, zz);
-    }
-
     double Square() const
     {
-        const TVector v1(p1().x - p2().x, p1().y - p2().y, p1().z - p2().z);
-        const TVector v2(p2().x - p3().x, p2().y - p3().y, p2().z - p3().z);
-
-        const TVector v3 = v1.CrossProduct(v2);
-
-        return v3.Length()/2;
+        return m_square;
     };
 
     TPoint3 Center() const

@@ -53,6 +53,7 @@ void ModelScene::Update()
 
 void ModelScene::FindMax()
 {
+    this->max = 0;
     for(int i=0; i<m_model->GetTriangles().size(); i++)
     {
         const TPoint3& p1 = m_model->GetTriangles()[i].p1();

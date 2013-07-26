@@ -10,7 +10,7 @@ public:
     ~TimeDiff();
 
     void    Start();
-    int     Diff();
+    unsigned int Diff();
     void    End();
 private:
     QTime m_start;

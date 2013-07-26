@@ -10,17 +10,17 @@ TimeDiff::~TimeDiff()
 
 }
 
-void    TimeDiff::Start()
+void TimeDiff::Start()
 {
     m_start = QTime::currentTime();
 }
 
-int   TimeDiff::Diff()
+unsigned int TimeDiff::Diff()
 {
-    return QTime::currentTime().msec() - m_start.msec();
+    return  m_start.msecsTo(QTime::currentTime());
 }
 
-void    TimeDiff::End()
+void TimeDiff::End()
 {
 
 }
