@@ -117,8 +117,31 @@ public:
         a1 = -a1 / k;
         a2 = -a2 / k;
 
-        //qDebug() << a1;
-        //qDebug() << a2;
+        TVector vNormal = tr.Normal();
+        T n01[3] = {vNormal.x, vNormal.y, vNormal.z};
+        T n02[3], n03[3], n[3];
+
+
+        T tes = 0;
+        for(int i=0; i<3; ++i)
+        {
+            tes+=RR[i]*n01[i];
+        }
+        tes*=3;
+
+        if( tes >0 )
+        {
+            for(int i=0; i<3; i++)
+            {
+                n01[i] = -n01[i];
+                n02[i] =  n01[i];
+                n03[i] =  n01[i];
+                n[i] = n01[i];
+            }
+        }
+
+        T n[3];
+
 
         return field;
     }
