@@ -181,9 +181,13 @@ private:
 
 	void CalcNormal()
 	{
-		m_normal.x = m_p1.y * m_p2.z - m_p1.z * m_p2.y;
-		m_normal.y = m_p1.z * m_p2.x - m_p1.x * m_p2.z;
-		m_normal.z = m_p1.x * m_p2.y - m_p1.y * m_p2.x;
+//		m_normal.x = m_p1.y * m_p2.z - m_p1.z * m_p2.y;
+//		m_normal.y = m_p1.z * m_p2.x - m_p1.x * m_p2.z;
+//		m_normal.z = m_p1.x * m_p2.y - m_p1.y * m_p2.x;
+
+        m_normal.x = (m_p2.y-m_p1.y)*(m_p3.z-m_p1.z)-(m_p2.z-m_p1.z)*(m_p3.y-m_p1.y);
+        m_normal.y = (m_p3.x-m_p1.x)*(m_p2.z-m_p1.z)-(m_p2.x-m_p1.x)*(m_p3.z-m_p1.z);
+        m_normal.z = (m_p2.x-m_p1.x)*(m_p3.y-m_p1.y)-(m_p3.x-m_p1.x)*(m_p2.y-m_p1.y);
 
 		m_normal.Normalize();
 	}

@@ -23,6 +23,8 @@
     PrintComplex(n.z); \
     qDebug() << "===============================\n"
 
+#define AD 0.001
+
 double round(double number)
 {
     return number < 0.0 ? ceil(number - 0.5) : floor(number + 0.5);
@@ -106,12 +108,12 @@ public:
         VecType DR0, DR1, DR2;
 
 
-        DR0 = R0 + R1;
+        DR0 = RR + R1;
         DR1 = Z2 - Z3;
         DR2 = Z1 - Z3;
 
 
-        T dd = tr.Square() / 2.0;
+        T dd = tr.Square()*2; // пока так
 
         T a1 = 0, a2 = 0;
 
@@ -160,7 +162,6 @@ public:
         VecType R0p = n.CrossProduct(RR);
         VecType R0t = RR - n*tes2;
         CVecType P1t;
-
 
         if(type == EConduction::Metal )
         {
@@ -226,6 +227,9 @@ public:
 
         // Bi1
         CVecType Bi1;
+        CVecType Bi2;
+        CVecType Bi3;
+        CVecType Bi4;
         {
             ComplexType v11 = -1/(a1*a1);
             ComplexType v12 = (ImOne/(ComplexType(a1)-ImI))/a1;
@@ -240,7 +244,6 @@ public:
         }
 
         // Bi2
-        CVecType Bi2;
         {
 
             ComplexType Bi21, Bi22, Bi23;
@@ -258,17 +261,11 @@ public:
             // Bi22
             {
                 ComplexType numV1 = ImOne - (std::exp(ia2)-ImOne)/(ia2);
-                PrintComplex(numV1);
                 ComplexType numV2Num = ia2 * std::exp(ia2) - std::exp(ia2) + ImOne;
-                PrintComplex(numV2Num);
                 ComplexType numV2Denum = ia2;
-                PrintComplex(numV2Denum);
                 ComplexType numV2 = (numV2Num)/numV2Denum;
-                PrintComplex(numV2);
                 ComplexType num =numV1 - numV2;
-                PrintComplex(num);
                 ComplexType denum = a2*a2;
-                PrintComplex(denum);
 
                 Bi22 =  - num/denum;
             }
@@ -283,7 +280,6 @@ public:
         }
 
         // Bi3
-        CVecType Bi3;
         {
             ComplexType Bi31, Bi32, Bi33;
 
@@ -291,17 +287,11 @@ public:
             // Bi31
             {
                 ComplexType numV1 = ImOne - (std::exp(ia1)-ImOne)/(ia1);
-                PrintComplex(numV1);
                 ComplexType numV2Num = ia1 * std::exp(ia1) - std::exp(ia1) + ImOne;
-                PrintComplex(numV2Num);
                 ComplexType numV2Denum = ia1;
-                PrintComplex(numV2Denum);
                 ComplexType numV2 = (numV2Num)/numV2Denum;
-                PrintComplex(numV2);
                 ComplexType num =numV1 + numV2;
-                PrintComplex(num);
                 ComplexType denum = a1*a1;
-                PrintComplex(denum);
 
                 Bi31 =  - num/denum;
             }
@@ -326,7 +316,6 @@ public:
         }
 
         // Bi4
-        CVecType Bi4;
         {
             ComplexType Bi41,Bi42,Bi43;
             ComplexType ia2 = ImI * a2;
@@ -336,15 +325,10 @@ public:
             // Bi41
             {
                 ComplexType num1 = (eia2 - ImOne) / ia2;
-                PrintComplex(num1);
                 ComplexType num2 = (eia1 - ImOne) / ia1;
-                PrintComplex(num2);
                 ComplexType num3 = (a2-a1);
-                PrintComplex(num3);
                 ComplexType num4 =  (ia1 * eia1 - eia1 + ImOne)/(ImI * a1*a1);
-                PrintComplex(num4);
                 ComplexType num = num1 - num2 - num3 * num4;
-                PrintComplex(num);
                 ComplexType denum = (a2-a1)*(a2-a1);
 
                 Bi41 = -num/denum;
@@ -352,15 +336,10 @@ public:
             // Bi42
             {
                 ComplexType num1 = (eia1 - ImOne) / ia1;
-                PrintComplex(num1);
                 ComplexType num2 = (eia2 - ImOne) / ia2;
-                PrintComplex(num2);
                 ComplexType num3 = (a1-a2);
-                PrintComplex(num3);
                 ComplexType num4 =  (ia2 * eia2 - eia2 + ImOne)/(ImI * a2*a2);
-                PrintComplex(num4);
                 ComplexType num = num1 - num2 - num3 * num4;
-                PrintComplex(num);
                 ComplexType denum = (a1-a2)*(a1-a2);
 
                 Bi42 = -num/denum;
@@ -374,15 +353,41 @@ public:
 
                 Bi43 = num/denum;
             }
-            PrintComplex(Bi41);
-            PrintComplex(Bi42);
-            PrintComplex(Bi43);
+
+            Bi4 = CVecType (Bi41, Bi42, Bi43);
         }
 
-//        PrintComplexVector(Bi1);
-//        PrintComplexVector(Bi2);
-//        PrintComplexVector(Bi3);
+        CVecType Bi;
 
+        if(  qAbs(a1) < AD && qAbs(a2) < AD  )
+            Bi = VecToCVec(Bi0);
+        else Bi = Bi1;
+
+        if(  qAbs(a1) >= AD && qAbs(a2) >= AD  )
+            Bi = Bi;
+        else Bi = Bi2;
+
+        if(  qAbs(a1) < AD && qAbs(a2) >= AD  )
+            Bi = Bi;
+        else Bi = Bi3;
+
+        if(  qAbs(a2) < AD && qAbs(a1) >= AD  )
+            Bi = Bi;
+        else Bi = Bi4;
+
+
+        tes = (R1 + (RR * Z3)).ManhattanLength();
+
+
+        field = std::exp(-ImI*k*tes) *
+                  dd   *
+                (( f.x  - f.y ) *
+                   Bi.z +
+                (  f.y  - f.z ) *
+                   Bi.x +
+                   f.z  * Bi.z );
+
+        PrintComplex(field);
         return field;
     }
 };

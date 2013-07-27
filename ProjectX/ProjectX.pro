@@ -24,7 +24,8 @@ SOURCES += main.cpp\
         Model/ModelView.cpp \
         Model/ModelScene.cpp \
         Algo/Algoritm.cpp \
-        calculatedialog.cpp
+        calculatedialog.cpp \
+    resultplot.cpp
 
 HEADERS  += mainwindow.h \
             Algo/exception.h \
@@ -44,7 +45,9 @@ HEADERS  += mainwindow.h \
             Algo/Algoritm.h \
             Calc/ComputeFieldDll.hpp \
             Calc/IComputeField.hpp \
-            calculatedialog.h
+            calculatedialog.h \
+    resultplot.h \
+    Calc/BaseComputeField.hpp
 
 
 FORMS    += mainwindow.ui \
