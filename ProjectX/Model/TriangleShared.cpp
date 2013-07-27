@@ -5,7 +5,7 @@ QVector<TPoint2> m_point2D;
 QVector<TPoint3> TriangleShared::Points3D;
 
 TriangleShared::TriangleShared(Model* parent)
-    : m_parent(parent), m_Visible(true)
+    : m_parent(parent), m_Visible(true), m_square(-1)
 {
 
 }
@@ -24,7 +24,12 @@ void TriangleShared::Set(int _A, int _B, int _C)
     m_B = _B;
     m_C = _C;
 
-    Recalc();
+    const TVector v1(p1().x - p2().x, p1().y - p2().y, p1().z - p2().z);
+    const TVector v2(p2().x - p3().x, p2().y - p3().y, p2().z - p3().z);
+
+    const TVector v3 = v1.CrossProduct(v2);
+
+    m_square = abs(v3.Length()/2);
 }
 
 const TPoint3& TriangleShared::p1() const
@@ -40,19 +45,4 @@ const TPoint3& TriangleShared::p3() const
 const TPoint3& TriangleShared::p2() const
 {
     return m_parent->m_points[m_B];
-}
-
-const int& TriangleShared::A() const
-{
-    return m_A;
-}
-
-const int& TriangleShared::B() const
-{
-    return m_B;
-}
-
-const int& TriangleShared::C() const
-{
-    return m_C;
 }

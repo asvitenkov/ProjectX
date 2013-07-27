@@ -24,8 +24,9 @@ SOURCES += main.cpp\
         Model/ModelView.cpp \
         Model/ModelScene.cpp \
         Algo/Algoritm.cpp \
-        calculatedialog.cpp \
-    resultplot.cpp
+        Algo/TimeDiff.cpp \
+        resultplot.cpp \
+    calculatedialog.cpp
 
 HEADERS  += mainwindow.h \
             Algo/exception.h \
@@ -45,12 +46,13 @@ HEADERS  += mainwindow.h \
             Algo/Algoritm.h \
             Calc/ComputeFieldDll.hpp \
             Calc/IComputeField.hpp \
-            calculatedialog.h \
-    resultplot.h \
-    Calc/BaseComputeField.hpp
-
+            resultplot.h \
+            Calc/BaseComputeField.hpp \
+            Algo/TimeDiff.h \
+    calculatedialog.h
 
 FORMS    += mainwindow.ui \
+    calculatedialog.ui \
     calculatedialog.ui
 
 LIBS += -L$$PWD/libfortran/ -lRCS_functions_cyl

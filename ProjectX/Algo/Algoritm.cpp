@@ -7,30 +7,59 @@
 #include <ostream>
 #include <cstdlib>
 #include <QVector>
+#include <QTimer>
 #include <cmath>
-#include <ctime>
+
+#include "TimeDiff.h"
 
 #include <QDebug>
 
-Model* Algoritm::manipulate()
+Algoritm::Algoritm()
+    : m_Epsilon(0.01)
 {
-    m_redirectPoints.clear();
-    m_point2D.clear();
-    checkedTrianglesCount = 0x0;
-    time_t start_timestamp = time(NULL);
+
+}
+
+Algoritm::~Algoritm()
+{
+
+}
+
+
+Model* Algoritm::Calculate()
+{
+    TimeDiff time;
+    time.Start();
+
+    m_amout = 0;
 
     //process
     {
         emit processStateChanged(0);
 
-        emit statusChanged("Preparing triangles:");
+        emit statusChanged("Sight vector: Theta-" + QString::number(m_vec.Theta())+", Phi-" + QString::number(m_vec.Phi()));
+        emit statusChanged("Preparing triangles..." + QString::number(m_model->GetTriangles().size()));
 
         Prepare();
         Calc(0, m_model->GetTriangles().size());
 
-        emit statusChanged("done\n");
+        emit statusChanged("Done... Time: " + QString::number(time.Diff()));
 
-        cleanPhase2();
+        emit processStateChanged(10);
+
+        emit statusChanged("Clean. Phase 1...");
+
+        CleanPhase1();
+
+        emit statusChanged("Done... Time: " + QString::number(time.Diff()));
+
+        emit processStateChanged(50);
+
+        CleanPhase2();
+
+        emit statusChanged("Done... Time: " + QString::number(time.Diff()));
+
+        emit processStateChanged(98);
     }
 
     for(int i=0; i < m_model->GetTriangles().size(); ++i)
@@ -38,14 +67,7 @@ Model* Algoritm::manipulate()
         m_model->GetTriangles()[i].SetVisible(!m_descr[i].IsDead);
     }
 
-    time_t end_timestamp = time(NULL);
-    std::cout << start_timestamp << " " << end_timestamp << std::endl;
-
-    double workTime = difftime(end_timestamp, start_timestamp);
-
-    emit statusChanged("Work time: " +QString::number(workTime) +" s or " +QString::number(workTime/60) +" min");
-    emit statusChanged("Count of projection triangles: " +QString::number(m_model->GetTriangles().size()));
-
+    emit statusChanged("Time: " + QString::number(time.Diff()));
     emit processStateChanged(100);
 
     return m_model;
@@ -61,18 +83,17 @@ void Algoritm::SetSightVector(const TVector &v)
     m_vec = v;
 }
 
-void Algoritm::cleanPhase2()
+void Algoritm::CleanPhase1()
 {
-    //clean - phase 2
-    emit statusChanged("Clean phase 2: ");
-
-    killNonShown(0, m_model->GetTriangles().size());
-
-    emit processStateChanged(98);
-    emit statusChanged("done\n");
+    CleanByNormal(0, m_model->GetTriangles().size());
 }
 
-void Algoritm::killNonShown(int start, int end)
+void Algoritm::CleanPhase2()
+{
+    KillNonShown(0, m_model->GetTriangles().size());
+}
+
+void Algoritm::CleanByNormal(int start, int end)
 {
     const int n = m_model->GetTriangles().size();
 
@@ -83,30 +104,75 @@ void Algoritm::killNonShown(int start, int end)
 
     for(int i = start; i < end; ++i)
     {
-        if(m_descr[i].IsDead == false)
+        TriangleShared& t = m_model->GetTriangles()[i];
+        TVector v1(t.p1()-t.p2());
+        TVector v2(t.p3()-t.p2());
+
+        TVector face(v1.CrossProduct(v2));
+        double distance = -(face.x*v1.x + face.y*v1.y + face.z*v1.z);
+        TPoint3 center =t.Center();
+
+        double m = -sgn(face.x*center.x + face.y*center.y + face.z*center.z + distance);
+
+        face *= m;
+        distance *= m;
+
+        const double value = (face.DotProduct(m_vec)+distance);
+        qDebug() << value;
+        if(!(value < -m_Epsilon))
         {
-            for(int j = i+1; j < m_model->GetTriangles().size(); ++j)
+            m_descr[i].IsDead = true;
+        }
+    }
+}
+
+void Algoritm::KillNonShown(int start, int end)
+{
+    const int N = m_model->GetTriangles().size();
+
+    if(end > N)
+    {
+        end = N;
+    }
+
+    for(int i = start; i < end; ++i)
+    {
+        TriangleDescr& descr_i = m_descr[i];
+        const TriangleShared& tr_i = m_model->GetTriangles()[i];
+
+        if(!descr_i.IsDead)
+        {
+            for(int j = i+1; j < N; ++j)
             {
-                if(!HaveSamePoint(m_model->GetTriangles()[j], m_model->GetTriangles()[i]))
+                TriangleDescr& descr_j = m_descr[j];
+                const TriangleShared& tr_j = m_model->GetTriangles()[j];
+
+                if(!HaveSamePoint(tr_j, tr_i))
                 {
-                    if(IsCrossedTriangles(m_model->GetTriangles()[j], m_model->GetTriangles()[i]))
+                    if(IsCrossedTriangles(tr_j, tr_i))
                     {
-                        if(m_descr[i].Distance < m_descr[j].Distance)
-                            m_descr[i].IsDead = true;
+                        if(descr_i.Distance < descr_j.Distance)
+                        {
+                            descr_i.IsDead = true;
+                        }
                         else
-                            m_descr[j].IsDead= true;
+                        {
+                            descr_j.IsDead= true;
+                        }
                     }
                 }
             }
         }
-
-        checkedTrianglesCount++;
     }
 }
 
 void Algoritm::Prepare()
 {
     const size_t N = m_model->GetTriangles().size();
+
+    m_redirectPoints.clear();
+    m_point2D.clear();
+    m_descr.clear();
 
     m_descr.resize(N);
     m_redirectPoints.resize(N);
@@ -125,61 +191,49 @@ void Algoritm::Calc(int start, int end)
 
     for(int i = start; i < N; i++)
     {
-        m_descr[i].IsDead = false;
-        FindCenter(m_model->GetTriangles()[i], m_descr[i]);
-        FindRadius(m_model->GetTriangles()[i], m_descr[i]);
-        FindDistance(m_model->GetTriangles()[i], m_descr[i]);
-        FindNormal(m_model->GetTriangles()[i], m_descr[i]);
+        const TriangleShared& tr = m_model->GetTriangles()[i];
+        TriangleDescr& descr = m_descr[i];
+
+        descr.IsDead = false;
+        FindCenter(tr, descr);
+        FindRadius(tr, descr);
+        FindDistance(tr, descr);
+        FindNormal(tr, descr);
     }
 }
 
 void Algoritm::FindRadius(const TriangleShared& tr, TriangleDescr& descr)
 {
-    double Radius = 0;
-    double tempA=0;
-    double tempB=0;
-    double tempC=0;
+    TPoint2& p1 = m_point2D[tr.A()];
+    TPoint2& p2 = m_point2D[tr.B()];
+    TPoint2& p3 = m_point2D[tr.C()];
 
-    TPoint3& p1 = m_redirectPoints[tr.A()];
-    TPoint3& p2 = m_redirectPoints[tr.B()];
-    TPoint3& p3 = m_redirectPoints[tr.C()];
+    TPoint3& cntr = descr.Center2D;
 
-    TPoint3& cntr = descr.RedirectedCenter3D;
+    const double tempA = ( p1.x- cntr.x)*( p1.x- cntr.x)+
+            ( p1.y- cntr.y)*( p1.y- cntr.y);
 
-    tempA=( p1.x - cntr.x)*( p1.x- cntr.x)+
-            ( p1.y- cntr.y)*( p1.y- cntr.y)+
-            ( p1.z- cntr.z)*( p1.z- cntr.z);
+    const double tempB = ( p2.x- cntr.x)*( p2.x- cntr.x)+
+            ( p2.y- cntr.y)*( p2.y- cntr.y);
 
-    tempB=( p2.x- cntr.x)*( p2.x- cntr.x)+
-            ( p2.y- cntr.y)*( p2.y- cntr.y)+
-            ( p2.z- cntr.z)*( p2.z- cntr.z);
+    const double tempC = (p3.x- cntr.x)*( p3.x- cntr.x)+
+            (p3.y- cntr.y)*( p3.y- cntr.y);
 
-    tempC=(p3.x- cntr.x)*( p3.x- cntr.x)+
-            (p3.y- cntr.y)*( p3.y- cntr.y)+
-            (p3.z- cntr.z)*( p3.z- cntr.z);
-
-    if(tempA>=tempB){
-        if(tempA>=tempC)
-            Radius = sqrt(tempA);
-        else
-            Radius = sqrt(tempC);
-    }
-    else
-    {
-        if(tempB>=tempC)
-            Radius = sqrt(tempB);
-        else
-            Radius = sqrt(tempC);
-    }
-
-    descr.Radius = Radius;
+    descr.SquaredRadius = std::max(tempA, std::max(tempB, tempC));
 }
-
 
 void Algoritm::FindCenter(const TriangleShared& tr, TriangleDescr& descr)
 {
-    descr.Center3D = (tr.p1() + tr.p2() + tr.p3())/3;
+    descr.Center3D = tr.Center();
     descr.RedirectedCenter3D = (MathHelper::Redirect(&descr.Center3D, &m_vec));
+
+    const double tcos = cos(m_vec.Theta());
+    const double tsin = sin(m_vec.Theta());
+    const double pcos = cos(m_vec.Phi());
+    const double psin = sin(m_vec.Phi());
+
+    descr.Center2D.x = -psin*descr.RedirectedCenter3D.x + pcos*descr.RedirectedCenter3D.y;
+    descr.Center2D.y = -tcos*pcos*descr.RedirectedCenter3D.x + -tcos*psin*descr.RedirectedCenter3D.y + tsin*descr.RedirectedCenter3D.z;
 }
 
 void Algoritm::FindRedirectPoint(int start, int end)
@@ -210,13 +264,15 @@ void Algoritm::FindRedirectPoint(int start, int end)
 
 bool Algoritm::IsCrossedTriangles(const TriangleShared& t1, const TriangleShared& t2) const
 {
-    const TPoint3& p11 = m_point2D[t1.A()];
-    const TPoint3& p12 = m_point2D[t1.B()];
-    const TPoint3& p13 = m_point2D[t1.C()];
+    if(IsTrianglePointInTriangle(t1,t2) || IsTrianglePointInTriangle(t2,t1)) return true;
 
-    const TPoint3& p21 = m_point2D[t2.A()];
-    const TPoint3& p22 = m_point2D[t2.B()];
-    const TPoint3& p23 = m_point2D[t2.C()];
+    const TPoint2& p11 = m_point2D[t1.A()];
+    const TPoint2& p12 = m_point2D[t1.B()];
+    const TPoint2& p13 = m_point2D[t1.C()];
+
+    const TPoint2& p21 = m_point2D[t2.A()];
+    const TPoint2& p22 = m_point2D[t2.B()];
+    const TPoint2& p23 = m_point2D[t2.C()];
 
     if(IsCrossedLines(p11, p12, p21, p22)) return true;
     if(IsCrossedLines(p11, p13, p21, p22)) return true;
@@ -233,17 +289,23 @@ bool Algoritm::IsCrossedTriangles(const TriangleShared& t1, const TriangleShared
     return false;
 }
 
-bool Algoritm::IsCrossedLines(const TPoint2& p11, const TPoint2& p12, const TPoint2& p21, const TPoint2& p22) const
+bool Algoritm::IsCrossedLines(const TPoint2& p1, const TPoint2& p2, const TPoint2& p3, const TPoint2& p4) const
 {
-    double k1 = (p11.y - p12.y)/(p11.x - p12.x);
-    double k2 = (p21.y - p22.y)/(p21.x - p22.x);
+    const double a1 = -(p2.y - p1.y);
+    const double b1 = +(p2.x - p1.x);
+    const double d1 = -(a1*p1.x + b1*p1.y);
 
-    double x = (p21.y - p11.y + k1*p11.x - k2*p21.x)/(k1 - k2);
+    const double a2 = -(p4.y - p3.y);
+    const double b2 = +(p4.x - p3.x);
+    const double d2 = -(a2*p3.x + b2*p3.y);
 
-    if(((x <= qMax(p11.x,p12.x))&&(x >= qMin(p12.x,p11.x)))&&((x <= qMax(p22.x,p21.x))&&(x >= qMin(p21.x,p22.x))))
-        return true;
+    const double seg1_line2_start = a2*p1.x + b2*p1.y + d2;
+    const double seg1_line2_end = a2*p2.x + b2*p2.y + d2;
 
-    return false;
+    const double seg2_line1_start = a1*p3.x + b1*p3.y + d1;
+    const double seg2_line1_end = a1*p4.x + b1*p4.y + d1;
+
+    return !(seg1_line2_start * seg1_line2_end >= 0 || seg2_line1_start * seg2_line1_end >= 0);
 }
 
 void Algoritm::FindDistance(const TriangleShared& tr, TriangleDescr& descr) const
@@ -265,19 +327,14 @@ void Algoritm::FindNormal(const TriangleShared& tr, TriangleDescr& descr) const
 
 bool Algoritm::IsCrossedRadius(const TriangleDescr& t1, const TriangleDescr& t2) const
 {
-    double d;
-    const TPoint3& p1 = t1.RedirectedCenter3D;
-    const TPoint3& p2 = t2.RedirectedCenter3D;
+    const TPoint2& p1 = t1.Center2D;
+    const TPoint2& p2 = t2.Center2D;
 
-    // TODO: Can refactor
-    d = (p1.x - p2.x)*(p1.x - p2.x)+
-            (p1.y - p2.y)*(p1.y - p2.y)+
-            (p1.z - p2.z)*(p1.z - p2.z);
+    const double distSqCenter =
+            ( p1.x - p2.x)*( p1.x - p2.x)+
+            ( p1.y - p2.y)*( p1.y - p2.y);
 
-    if(d < ( d + t2.Radius ))
-        return true;
-
-    return false;
+    return (t1.SquaredRadius + t2.SquaredRadius) < distSqCenter;
 }
 
 bool Algoritm::HaveSamePoint(const TriangleShared& t1, const TriangleShared& t2) const
@@ -292,4 +349,41 @@ bool Algoritm::HaveSamePoint(const TriangleShared& t1, const TriangleShared& t2)
     if(t1.C() == t2.B()) return true;
     if(t1.C() == t2.C()) return true;
     return false;
+}
+
+bool Algoritm::IsTrianglePointInTriangle(const TriangleShared& t1, const TriangleShared& t2) const
+{
+    const TPoint2& p11 = m_point2D[t1.A()];
+    const TPoint2& p12 = m_point2D[t1.B()];
+    const TPoint2& p13 = m_point2D[t1.C()];
+
+    const TPoint2* p[3] = {&m_point2D[t2.A()],
+                           &m_point2D[t2.B()],
+                           &m_point2D[t2.C()]};
+
+    const double xA = p12.x - p11.x;
+    const double yA = p12.y - p11.y;
+
+    const double xB = p13.x - p11.x;
+    const double yB = p13.y - p11.y;
+
+    bool crossed = false;
+    double xC, yC, m, l;
+    int i = 0;
+    while(!(crossed || i>2))
+    {
+        xC = p[i]->x - p11.x;
+        yC = p[i]->y - p11.y;
+
+        m = (xC*yA - xA*yC)/(xB*yA - xA*yB);
+
+        if(m > 0 && m <= 1.0)
+        {
+            l = (xC - m*xB) / xA;
+            crossed = ( (l >= 0) && ((m + l) <= 1));
+        }
+        ++i;
+    }
+
+    return crossed;
 }

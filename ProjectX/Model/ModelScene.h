@@ -7,7 +7,7 @@
 #include "Model/TriangleShared.h"
 #include "Model/Model.h"
 
-#define OFFSET_RATIO 100
+#define OFFSET_RATIO 10
 
 class ModelScene : public QGLWidget
 {

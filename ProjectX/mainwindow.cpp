@@ -154,7 +154,7 @@ void MainWindow::processStatusChanged(int x)
     if(x > 10)
     {
         this->setCursor(Qt::ArrowCursor);
-        //m_view.GetModelScene()->Update();
+        m_view.GetModelScene()->Update();
     }
 }
 
