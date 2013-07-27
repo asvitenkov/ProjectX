@@ -1,5 +1,6 @@
 #include "calculatedialog.h"
 #include "ui_calculatedialog.h"
+#include "resultplot.h"
 
 
 QString EConductionToString(EConduction::TYPE value)
@@ -32,9 +33,7 @@ void CalculateDialog::InitDialog()
     ui->grpbxInputParam->setTitle(tr("Input parametrs"));
 
 
-    QString waveNumberFormatStr = QString("<html>%1 (m<sup>-1</sup>)</html>").arg(tr("Wavenumber"));
     ui->lblWavenumber->setTextFormat(Qt::RichText);
-    ui->lblWavenumber->setText(waveNumberFormatStr);
 
 
 
@@ -48,13 +47,32 @@ void CalculateDialog::InitDialog()
 
     connect(ui->btnCalculate,SIGNAL(clicked()),this,SLOT(OnBtnCalculate()));
 
+
+
+    //ui->verticalLayout_2->addWidget(new ResultPlot(0,0,1,1,0,0));
+
 }
 
-double CalculateDialog::Wavenumber()
+double CalculateDialog::Wavelength()
 {
-    return ui->dspnbxWavenumber->value();
+    return ui->dspnbxWavelength->value();
 }
 
+double CalculateDialog::AzimuthAngle()
+{
+    return ui->dspnbxAzimuthAngle->value();
+}
+
+double CalculateDialog::ZenithAngle()
+{
+    return ui->dspnbxZenithAngle->value();
+}
+
+
+double CalculateDialog::PhiNab()
+{
+    return ui->dspnbxPhinab->value();
+}
 
 
 TComplex CalculateDialog::M1()
@@ -73,9 +91,9 @@ EConduction::TYPE CalculateDialog::Material()
 }
 
 
-void CalculateDialog::SetWavenumber(double value)
+void CalculateDialog::SetWavelength(double value)
 {
-    ui->dspnbxWavenumber->setValue(value);
+    ui->dspnbxWavelength->setValue(value);
 }
 
 
@@ -102,4 +120,12 @@ void CalculateDialog::OnBtnCalculate()
 {
     // Process calculate
 
+}
+
+
+
+
+void CalculateDialog::Print(QString text)
+{
+    ui->resultBrowser->append(text);
 }
