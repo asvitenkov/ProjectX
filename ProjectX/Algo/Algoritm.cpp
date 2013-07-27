@@ -17,6 +17,8 @@
 Algoritm::Algoritm(QObject* obj)
     : QObject(obj)
     , m_Epsilon(0.01)
+    , m_finalProcessedTriangles(1)
+    , m_processedTriangles(0)
 {
 }
 
@@ -47,7 +49,7 @@ Model* Algoritm::Calculate()
 
         emit statusChanged("Done... Time: " + QString::number(time.Diff()));
 
-        //CleanPhase2();
+        CleanPhase2();
 
         emit statusChanged("Done... Time: " + QString::number(time.Diff()));
     }

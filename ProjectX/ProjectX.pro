@@ -25,7 +25,8 @@ SOURCES += main.cpp\
         Model/ModelScene.cpp \
         Algo/Algoritm.cpp \
         calculatedialog.cpp \
-    Algo/TimeDiff.cpp
+        Algo/TimeDiff.cpp \
+        resultplot.cpp
 
 HEADERS  += mainwindow.h \
             Algo/exception.h \
@@ -45,9 +46,10 @@ HEADERS  += mainwindow.h \
             Algo/Algoritm.h \
             Calc/ComputeFieldDll.hpp \
             Calc/IComputeField.hpp \
+            Calc/BaseComputeField.hpp \
             calculatedialog.h \
-    Algo/TimeDiff.h
-
+            Algo/TimeDiff.h \
+            resultplot.h
 
 FORMS    += mainwindow.ui \
     calculatedialog.ui
