@@ -14,29 +14,25 @@
 
 #include <QDebug>
 
-Algoritm::Algoritm()
-    : m_Epsilon(0.01)
+Algoritm::Algoritm(QObject* obj)
+    : QObject(obj)
+    , m_Epsilon(0.01)
 {
-
 }
 
 Algoritm::~Algoritm()
 {
-
 }
-
 
 Model* Algoritm::Calculate()
 {
     TimeDiff time;
     time.Start();
 
-    m_amout = 0;
-
+    m_finalProcessedTriangles = m_model->GetTriangles().size()*2;
+    emit processStateChanged(0);
     //process
     {
-        emit processStateChanged(0);
-
         emit statusChanged("Sight vector: Theta-" + QString::number(m_vec.Theta())+", Phi-" + QString::number(m_vec.Phi()));
         emit statusChanged("Preparing triangles..." + QString::number(m_model->GetTriangles().size()));
 
@@ -45,22 +41,17 @@ Model* Algoritm::Calculate()
 
         emit statusChanged("Done... Time: " + QString::number(time.Diff()));
 
-        emit processStateChanged(10);
-
         emit statusChanged("Clean. Phase 1...");
 
         CleanPhase1();
 
         emit statusChanged("Done... Time: " + QString::number(time.Diff()));
 
-        emit processStateChanged(50);
-
-        CleanPhase2();
+        //CleanPhase2();
 
         emit statusChanged("Done... Time: " + QString::number(time.Diff()));
-
-        emit processStateChanged(98);
     }
+    emit processStateChanged(98);
 
     for(int i=0; i < m_model->GetTriangles().size(); ++i)
     {
@@ -85,12 +76,32 @@ void Algoritm::SetSightVector(const TVector &v)
 
 void Algoritm::CleanPhase1()
 {
-    CleanByNormal(0, m_model->GetTriangles().size());
+    m_processedTriangles  = 0;
+    QThreadPool* pool = new QThreadPool();
+
+    const int step = m_model->GetTriangles().size()/THREAD_COUNT;
+    for(int i = 0; i<THREAD_COUNT; i++)
+    {
+        pool->start(new MultiTask(this, &Algoritm::CleanByNormal, i*step, step + i*step));
+    }
+    pool->waitForDone();
+    delete pool;
+    //CleanByNormal(0, m_model->GetTriangles().size());
 }
 
 void Algoritm::CleanPhase2()
 {
-    KillNonShown(0, m_model->GetTriangles().size());
+    m_processedTriangles  = 0;
+    QThreadPool* pool = new QThreadPool();
+
+    const int step = m_model->GetTriangles().size()/THREAD_COUNT;
+    for(int i = 0; i<THREAD_COUNT; i++)
+    {
+        pool->start(new MultiTask(this, &Algoritm::KillNonShown, i*step, step + i*step));
+    }
+    pool->waitForDone();
+    delete pool;
+    //KillNonShown(0, m_model->GetTriangles().size());
 }
 
 void Algoritm::CleanByNormal(int start, int end)
@@ -118,11 +129,11 @@ void Algoritm::CleanByNormal(int start, int end)
         distance *= m;
 
         const double value = (face.DotProduct(m_vec)+distance);
-        qDebug() << value;
         if(!(value < -m_Epsilon))
         {
             m_descr[i].IsDead = true;
         }
+        m_processedTriangles++;
     }
 }
 
@@ -163,6 +174,7 @@ void Algoritm::KillNonShown(int start, int end)
                 }
             }
         }
+        m_processedTriangles++;
     }
 }
 
@@ -386,4 +398,9 @@ bool Algoritm::IsTrianglePointInTriangle(const TriangleShared& t1, const Triangl
     }
 
     return crossed;
+}
+
+void Algoritm::NotifyAboutState()
+{
+    emit processStateChanged(m_processedTriangles/m_finalProcessedTriangles*100);
 }

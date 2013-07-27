@@ -20,7 +20,7 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
-    ModelView m_view, outputModelMaker;
+    ModelView m_view;
 
 private:
     QVector<TriangleShared> triangles;
@@ -28,14 +28,14 @@ private:
     QVector<TriangleShared> data;
     Algoritm *m_algo;
     ProcessThread *pthread;
-
-    Model* m_model;
+    QTimer* m_timer;
 
 public slots:
     void openHandler();
     void processHandler();
     void procesBorderLinesFile(QString filePath);
     void saveHandler();
+    void resetHandler();
     void rotationAngleChanged();
     void stateChanged(QString state);
     void processStatusChanged(int);

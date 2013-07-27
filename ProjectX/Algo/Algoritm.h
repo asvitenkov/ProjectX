@@ -7,14 +7,13 @@
 #include "Model/Model.h"
 
 #include <QVector>
-
+#include <QThreadPool>
 #include <QString>
 #include <QDateTime>
 #include <QObject>
+#include <QTimer>
 
-#define START_PROCCESS 15
 #define THREAD_COUNT 16
-#define NET_SIZE 10
 
 struct TriangleDescr
 {
@@ -29,15 +28,20 @@ struct TriangleDescr
     TVector Normal;
 };
 
-class Algoritm: public QObject{
+class Algoritm: public QObject
+{
     Q_OBJECT
 public:
-    Algoritm();
+    Algoritm(QObject* obj=0);
     ~Algoritm();
     void SetModel(Model* model);
     void SetSightVector(const TVector& v);
 
     Model* Calculate();
+
+    typedef void (Algoritm::* TMultiFunc)(int start, int end);
+public slots:
+    void NotifyAboutState();
 private:
     Model* m_model;
 
@@ -46,9 +50,10 @@ private:
     QVector<TPoint3>        m_point2D;
 
     TVector m_vec;
-    int m_amout;
 
     float m_Epsilon;
+    unsigned int m_processedTriangles;
+    unsigned int m_finalProcessedTriangles;
 
     void Prepare();
     void Calc(int start, int end);
@@ -74,6 +79,29 @@ signals:
     void statusChanged(QString);
     void processStateChanged(int);
 };
+
+class MultiTask : public QRunnable
+{
+public:
+    explicit MultiTask(Algoritm* algo, Algoritm::TMultiFunc func, int start, int end)
+    {
+        m_algo = algo;
+        m_func = func;
+        m_start = start;
+        m_end = end;
+    }
+
+    void run()
+    {
+        (m_algo->*m_func)(m_start, m_end);
+        return;
+    }
+ private:
+    Algoritm* m_algo;
+    Algoritm::TMultiFunc m_func;
+    int m_start;
+    int m_end;
+ };
 
 template <typename T> int sgn(T val) {
     return (T(0) < val) - (val < T(0));

@@ -18,7 +18,10 @@ public:
     ~ModelScene();
 
     void Update();
+    void ReChange();
+
     void SetModel(Model* model);
+    Model* GetModel() const;
     void setBorderPointsIndexes(QVector<unsigned int> &indexes);
 
     int getXRot();
@@ -31,7 +34,6 @@ private:
     void drawAxis();
 
     void drawBorderPoints();
-
 
     int xRot;
     int yRot;
@@ -60,8 +62,6 @@ private:
     QPoint lastPos;
 
 protected:
-    /* Get 3d point */
-    TPoint3 getPointFun(int index);
     /* Init OpenGL Enviroment */
     void initializeGL();
     /*

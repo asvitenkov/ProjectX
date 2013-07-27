@@ -21,12 +21,10 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
     , m_algo(NULL)
     , pthread(NULL)
-    , m_model(NULL)
 {
     ui->setupUi(this);
     ui->originalViewTab->setLayout(new QHBoxLayout());
     ui->originalViewTab->layout()->addWidget(&m_view);
-
 
     CalculateDialog *dialog = new CalculateDialog();
 
@@ -37,23 +35,36 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->showButton, SIGNAL(clicked()), this, SLOT(processHandler()));
     connect(ui->showButton, SIGNAL(clicked()), this, SLOT(processHandler()));
     connect(ui->actionSave, SIGNAL(triggered()), this, SLOT(saveHandler()));
+    connect(ui->actionReset, SIGNAL(triggered()), this, SLOT(resetHandler()));
 
     connect( m_view.GetModelScene(), SIGNAL(xRotationChanged(int)), this, SLOT(rotationAngleChanged()) );
     connect( m_view.GetModelScene(), SIGNAL(zRotationChanged(int)), this, SLOT(rotationAngleChanged()) );
     connect( m_view.GetModelScene(), SIGNAL(yRotationChanged(int)), this, SLOT(rotationAngleChanged()) );
 
-    pthread = new ProcessThread();
-
-
-
     ui->aSpinBox->setMinimum(0);
     ui->aSpinBox->setMaximum(360);
     ui->fiSphinBox->setMinimum(0);
     ui->fiSphinBox->setMaximum(360.0);
+
+    pthread = new ProcessThread();
+
+    m_algo = new Algoritm(pthread);
+    m_algo->SetModel(m_view.GetModelScene()->GetModel());
+
+    connect(m_algo, SIGNAL(processStateChanged(int)), this, SLOT(processStatusChanged(int)), Qt::QueuedConnection);
+    connect(m_algo, SIGNAL(statusChanged(QString)), this, SLOT(stateChanged(QString)), Qt::QueuedConnection);
+
+    m_timer = new QTimer(this);
+    m_timer->setInterval(1000);
+    m_timer->setSingleShot(false);
+    connect(m_timer, SIGNAL(timeout()), m_algo, SLOT(NotifyAboutState()));
+
+    m_timer->start();
 }
 
 MainWindow::~MainWindow()
 {
+    delete pthread;
     delete ui;
 }
 
@@ -68,25 +79,13 @@ void MainWindow::openHandler()
 
     if(filename.endsWith(".mail"))
     {
-        m_algo = new Algoritm();
-        connect(m_algo, SIGNAL(processStateChanged(int)), this, SLOT(processStatusChanged(int)), Qt::QueuedConnection);
-        connect(m_algo, SIGNAL(statusChanged(QString)), this, SLOT(stateChanged(QString)), Qt::QueuedConnection);
-
-        Model* model = new Model();
+        Model* model = m_view.GetModelScene()->GetModel();
         model->Create(filename);
-
-        m_algo->SetModel(model);
-        m_view.GetModelScene()->SetModel(model);
+        m_view.GetModelScene()->ReChange();
     }
     else
     {
-        if(m_algo != 0x0)
-            procesBorderLinesFile(filename);
-        else
-        {
-            QMessageBox::warning(this, tr("Warning"), "Open please mail file for first");
-            return;
-        }
+        procesBorderLinesFile(filename);
     }
 }
 
@@ -94,11 +93,9 @@ void MainWindow::processHandler()
 {
     setCursor(Qt::WaitCursor);
 
-    QDate startDate = QDate::currentDate();
-
     TVector polVec;
 
-    polVec.Set(ui->aSpinBox->value()*M_PI/180, ui->fiSphinBox->value()*M_PI/180, 1);
+    polVec.Set(ui->aSpinBox->value()*M_PI/180, ui->fiSphinBox->value()*M_PI/180, 1000);
 
     m_algo->SetSightVector(polVec);
     m_view.GetModelScene()->setDrawNormal(true);
@@ -158,3 +155,11 @@ void MainWindow::processStatusChanged(int x)
     }
 }
 
+void MainWindow::resetHandler()
+{
+    Model* model = m_view.GetModelScene()->GetModel();
+    for(int i = 0; i<model->GetTriangles().size(); i++)
+    {
+        model->GetTriangles()[i].SetVisible(true);
+    }
+}
