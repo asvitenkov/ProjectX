@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui opengl
+QT += core gui opengl
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -24,11 +24,11 @@ SOURCES += main.cpp\
         Model/ModelView.cpp \
         Model/ModelScene.cpp \
         Algo/Algoritm.cpp \
+        calculatedialog.cpp \
         Algo/TimeDiff.cpp \
-        resultplot.cpp \
-    calculatedialog.cpp
+        resultplot.cpp
 
-HEADERS  += mainwindow.h \
+HEADERS += mainwindow.h \
             Algo/exception.h \
             edgeselector.h \
             processthread.h \
@@ -46,13 +46,12 @@ HEADERS  += mainwindow.h \
             Algo/Algoritm.h \
             Calc/ComputeFieldDll.hpp \
             Calc/IComputeField.hpp \
-            resultplot.h \
             Calc/BaseComputeField.hpp \
+            calculatedialog.h \
             Algo/TimeDiff.h \
-    calculatedialog.h
+            resultplot.h
 
-FORMS    += mainwindow.ui \
-    calculatedialog.ui \
+FORMS += mainwindow.ui \
     calculatedialog.ui
 
 LIBS += -L$$PWD/libfortran/ -lRCS_functions_cyl

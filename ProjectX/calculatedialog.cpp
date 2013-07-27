@@ -1,7 +1,9 @@
 #include "calculatedialog.h"
 #include "ui_calculatedialog.h"
 #include "resultplot.h"
-
+#include "Calc/BaseComputeField.hpp"
+#include "Algo/Algoritm.h"
+#include "processthread.h"
 
 QString EConductionToString(EConduction::TYPE value)
 {
@@ -12,8 +14,13 @@ QString EConductionToString(EConduction::TYPE value)
     return "";
 }
 
-CalculateDialog::CalculateDialog(QWidget *parent) :
-    QWidget(parent),
+QString complexToString(TComplex val)
+{
+    return QString("(%1; %2)").arg(QString::number(val.real())).arg(QString::number(val.imag()));
+}
+
+CalculateDialog::CalculateDialog(ModelView *modelView, QWidget *parent) :
+    QWidget(parent), mModelView(modelView),
     ui(new Ui::CalculateDialog)
 {
     ui->setupUi(this);
@@ -37,13 +44,15 @@ void CalculateDialog::InitDialog()
 
 
 
-    mMaterial[EConductionToString(EConduction::Metal)] = EConduction::Metal;
     mMaterial[EConductionToString(EConduction::Dielectric)] = EConduction::Dielectric;
+    mMaterial[EConductionToString(EConduction::Metal)] = EConduction::Metal;
+
 
     QList<QString> mapKeys = mMaterial.keys();
     for(int i=0; i<mapKeys.size(); ++i)
         ui->cmbbxMaterial->addItem(mapKeys[i]);
 
+    SetMaterial(EConduction::Metal);
 
     connect(ui->btnCalculate,SIGNAL(clicked()),this,SLOT(OnBtnCalculate()));
 
@@ -119,6 +128,62 @@ void CalculateDialog::SetMaterial(const EConduction::TYPE &value)
 void CalculateDialog::OnBtnCalculate()
 {
     // Process calculate
+
+    QVector<TriangleShared> triangles =  mModelView->GetModelScene()->GetModel()->GetTriangles();
+    BaseComputeField<double> compute;
+
+    TComplex result(0);
+
+    ProcessThread pthread;
+    Algoritm m_algo;
+    m_algo.SetModel(mModelView->GetModelScene()->GetModel());
+
+    TVector polVec;
+
+    polVec.Set(ZenithAngle()*M_PI/180, AzimuthAngle()*M_PI/180, 1000);
+
+    m_algo.SetSightVector(polVec);
+    mModelView->GetModelScene()->setDrawNormal(true);
+    mModelView->GetModelScene()->setNormal(polVec.Theta(), polVec.Phi());
+
+    pthread.setAlgs(&m_algo);
+
+    QEventLoop loop;
+
+    connect(&pthread,SIGNAL(finished()),&loop,SLOT(quit()));
+    pthread.start();
+
+    loop.exec();
+
+
+    for(int i=0; i< triangles.size(); ++i)
+    {
+        TriangleShared tr = triangles.at(i);
+
+        if(!tr.IsVisible())
+            continue;
+
+        TTriangle sTr(tr.p1(), tr.p2(), tr.p3());
+        result += compute.CalculateTriangleField(sTr, AzimuthAngle(),ZenithAngle(),PhiNab(),Wavelength(),M1(),E1(),Material());
+
+    }
+
+    QString msg;
+
+
+    msg = QString("Tetha %1, Phi %2, PhiNab %3, Wavelength %4, Material %5, E1 %6, M1 %7")
+            .arg(QString::number(AzimuthAngle()))
+            .arg(QString::number(ZenithAngle()))
+            .arg(QString::number(PhiNab()))
+            .arg(QString::number(Wavelength()))
+            .arg(EConductionToString(Material()))
+            .arg(complexToString(E1()))
+            .arg(complexToString(M1()));
+
+    Print("===================");
+    Print(msg);
+    Print("Result: "+complexToString(result));
+    Print("");
 
 }
 

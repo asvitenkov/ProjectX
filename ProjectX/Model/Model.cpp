@@ -10,6 +10,7 @@ Model::Model(QObject* widget)
 void Model::Create(const QString& filepath)
 {
     m_triangles.clear();
+    m_points.clear();
 
     TPoint3 pointTmp;
     TriangleShared triangleTmp(this);

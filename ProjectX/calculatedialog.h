@@ -5,6 +5,7 @@
 #include "Calc/IComputeField.hpp"
 #include "Math/MathDefines.h"
 #include <QMap>
+#include "Model/ModelView.h"
 
 namespace Ui {
 class CalculateDialog;
@@ -15,7 +16,7 @@ class CalculateDialog : public QWidget
     Q_OBJECT
     
 public:
-    explicit CalculateDialog(QWidget *parent = 0);
+    explicit CalculateDialog(ModelView* modelView, QWidget *parent = 0);
     ~CalculateDialog();
     
     double Wavelength();
@@ -40,6 +41,7 @@ private:
 
     Ui::CalculateDialog *ui;
     QMap<QString,EConduction::TYPE> mMaterial;
+    ModelView *mModelView;
 
 protected slots:
     void OnBtnCalculate();

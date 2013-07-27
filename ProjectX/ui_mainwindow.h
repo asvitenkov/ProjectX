@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'mainwindow.ui'
 **
-** Created: Thu 18. Apr 13:33:14 2013
+** Created: Sat 27. Jul 15:31:40 2013
 **      by: Qt User Interface Compiler version 4.8.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -38,6 +38,7 @@ class Ui_MainWindow
 public:
     QAction *actionOpen;
     QAction *actionSave;
+    QAction *actionReset;
     QWidget *centralWidget;
     QVBoxLayout *verticalLayout;
     QTabWidget *projectionViewWidget;
@@ -69,6 +70,8 @@ public:
         actionOpen->setObjectName(QString::fromUtf8("actionOpen"));
         actionSave = new QAction(MainWindow);
         actionSave->setObjectName(QString::fromUtf8("actionSave"));
+        actionReset = new QAction(MainWindow);
+        actionReset->setObjectName(QString::fromUtf8("actionReset"));
         centralWidget = new QWidget(MainWindow);
         centralWidget->setObjectName(QString::fromUtf8("centralWidget"));
         verticalLayout = new QVBoxLayout(centralWidget);
@@ -116,6 +119,7 @@ public:
 
         aSpinBox = new QDoubleSpinBox(parametersGroupBOx);
         aSpinBox->setObjectName(QString::fromUtf8("aSpinBox"));
+        aSpinBox->setMaximum(360);
 
         horizontalLayout_2->addWidget(aSpinBox);
 
@@ -126,6 +130,7 @@ public:
 
         fiSphinBox = new QDoubleSpinBox(parametersGroupBOx);
         fiSphinBox->setObjectName(QString::fromUtf8("fiSphinBox"));
+        fiSphinBox->setMaximum(360);
 
         horizontalLayout_2->addWidget(fiSphinBox);
 
@@ -144,7 +149,7 @@ public:
         MainWindow->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(MainWindow);
         menuBar->setObjectName(QString::fromUtf8("menuBar"));
-        menuBar->setGeometry(QRect(0, 0, 910, 25));
+        menuBar->setGeometry(QRect(0, 0, 910, 21));
         menuFile = new QMenu(menuBar);
         menuFile->setObjectName(QString::fromUtf8("menuFile"));
         MainWindow->setMenuBar(menuBar);
@@ -161,6 +166,7 @@ public:
         menuBar->addAction(menuFile->menuAction());
         menuFile->addAction(actionOpen);
         menuFile->addAction(actionSave);
+        menuFile->addAction(actionReset);
 
         retranslateUi(MainWindow);
 
@@ -177,6 +183,7 @@ public:
         actionOpen->setShortcut(QApplication::translate("MainWindow", "Ctrl+O", 0, QApplication::UnicodeUTF8));
         actionSave->setText(QApplication::translate("MainWindow", "Save", 0, QApplication::UnicodeUTF8));
         actionSave->setShortcut(QApplication::translate("MainWindow", "Ctrl+S", 0, QApplication::UnicodeUTF8));
+        actionReset->setText(QApplication::translate("MainWindow", "Reset", 0, QApplication::UnicodeUTF8));
         projectionViewWidget->setTabText(projectionViewWidget->indexOf(originalViewTab), QApplication::translate("MainWindow", "Model viewss", 0, QApplication::UnicodeUTF8));
         projectionViewWidget->setTabText(projectionViewWidget->indexOf(doubleViewTab), QApplication::translate("MainWindow", "Log", 0, QApplication::UnicodeUTF8));
         parametersGroupBOx->setTitle(QApplication::translate("MainWindow", "Parameters", 0, QApplication::UnicodeUTF8));

@@ -7,7 +7,6 @@
 #include <QDebug>
 #include <limits.h>
 
-
 #define ImOne ComplexType(1,0)
 #define ImI ComplexType(0,1)
 #define ImZero ComplexType(0)
@@ -388,7 +387,11 @@ public:
                    f.z  * Bi.z );
 
         PrintComplex(field);
-        return field;
+
+        if(field.real()!=field.real() || field.imag()!=field.imag())
+            return ComplexType(0);
+        else
+            return field;
     }
 };
 

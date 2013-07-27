@@ -45,6 +45,15 @@ void ModelScene::SetModel(Model* model)
     OnChange();
 }
 
+Model* ModelScene::GetModel() const
+{
+    return m_model;
+}
+
+void ModelScene::ReChange()
+{
+    OnChange();
+}
 
 void ModelScene::Update()
 {
@@ -116,8 +125,6 @@ void ModelScene::setDrawNormal(const bool enable)
 void ModelScene::drawAxis()
 {
 
-    //draw axis
-    //z-axis
     qglColor(Qt::blue);
     glLineWidth(3.0);
     glBegin(GL_LINES);
@@ -155,11 +162,6 @@ void ModelScene::drawBorderPoints()
         glVertex3f(point.x/max, point.y/max, point.z/max);
         glEnd();
     }
-}
-
-TPoint3 ModelScene::getPointFun(int index)
-{
-    return points->at(index);
 }
 
 void ModelScene::initializeGL()

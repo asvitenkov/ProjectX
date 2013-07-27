@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>288</width>
+    <width>359</width>
     <height>466</height>
    </rect>
   </property>
@@ -141,6 +141,9 @@
               <property name="singleStep">
                <double>50.000000000000000</double>
               </property>
+              <property name="value">
+               <double>0.300000000000000</double>
+              </property>
              </widget>
             </item>
             <item row="4" column="0">
@@ -153,7 +156,11 @@
             <item row="4" column="1">
              <layout class="QHBoxLayout" name="horizontalLayout_2">
               <item>
-               <widget class="QDoubleSpinBox" name="dspnbxE1Real"/>
+               <widget class="QDoubleSpinBox" name="dspnbxE1Real">
+                <property name="value">
+                 <double>1.000000000000000</double>
+                </property>
+               </widget>
               </item>
               <item>
                <widget class="QLabel" name="lbl">
@@ -184,7 +191,11 @@
             <item row="5" column="1">
              <layout class="QHBoxLayout" name="horizontalLayout_3">
               <item>
-               <widget class="QDoubleSpinBox" name="dspnbxM1Real"/>
+               <widget class="QDoubleSpinBox" name="dspnbxM1Real">
+                <property name="value">
+                 <double>1.000000000000000</double>
+                </property>
+               </widget>
               </item>
               <item>
                <widget class="QLabel" name="label">
