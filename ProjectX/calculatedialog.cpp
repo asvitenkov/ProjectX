@@ -77,13 +77,6 @@ double CalculateDialog::ZenithAngle()
     return ui->dspnbxZenithAngle->value();
 }
 
-
-double CalculateDialog::PhiNab()
-{
-    return ui->dspnbxPhinab->value();
-}
-
-
 TComplex CalculateDialog::M1()
 {
     return TComplex(ui->dspnbxM1Real->value(),ui->dspnbxM1Img->value());
@@ -156,34 +149,39 @@ void CalculateDialog::OnBtnCalculate()
     loop.exec();
 
 
-    for(int i=0; i< triangles.size(); ++i)
+    for(double j=ui->dspnbxPhinabFrom->value(); j<=ui->dspnbxPhinabTo->value(); j+=ui->dspnbxPhinabStep->value())
     {
-        TriangleShared tr = triangles.at(i);
 
-        if(!tr.IsVisible())
-            continue;
+        for(int i=0; i< triangles.size(); ++i)
+        {
+            const TriangleShared &tr = triangles[i];
 
-        TTriangle sTr(tr.p1(), tr.p2(), tr.p3());
-        result += compute.CalculateTriangleField(sTr, AzimuthAngle(),ZenithAngle(),PhiNab(),Wavelength(),M1(),E1(),Material());
+            if(!tr.IsVisible())
+                continue;
+
+            TTriangle sTr(tr.p1(), tr.p2(), tr.p3());
+            result += compute.CalculateTriangleField(sTr, AzimuthAngle(),ZenithAngle(),j,Wavelength(),M1(),E1(),Material());
+
+        }
+
+        QString msg;
+
+
+        msg = QString("Tetha %1, Phi %2, PhiNab %3, Wavelength %4, Material %5, E1 %6, M1 %7")
+                .arg(QString::number(AzimuthAngle()))
+                .arg(QString::number(ZenithAngle()))
+                .arg(QString::number(j))
+                .arg(QString::number(Wavelength()))
+                .arg(EConductionToString(Material()))
+                .arg(complexToString(E1()))
+                .arg(complexToString(M1()));
+
+        Print("===================");
+        Print(msg);
+        Print("Result: "+complexToString(result));
+        Print("");
 
     }
-
-    QString msg;
-
-
-    msg = QString("Tetha %1, Phi %2, PhiNab %3, Wavelength %4, Material %5, E1 %6, M1 %7")
-            .arg(QString::number(AzimuthAngle()))
-            .arg(QString::number(ZenithAngle()))
-            .arg(QString::number(PhiNab()))
-            .arg(QString::number(Wavelength()))
-            .arg(EConductionToString(Material()))
-            .arg(complexToString(E1()))
-            .arg(complexToString(M1()));
-
-    Print("===================");
-    Print(msg);
-    Print("Result: "+complexToString(result));
-    Print("");
 
 }
 
@@ -193,4 +191,12 @@ void CalculateDialog::OnBtnCalculate()
 void CalculateDialog::Print(QString text)
 {
     ui->resultBrowser->append(text);
+}
+
+
+
+
+void CalculateDialog::OnBtnClearLog()
+{
+    ui->resultBrowser->clear();
 }

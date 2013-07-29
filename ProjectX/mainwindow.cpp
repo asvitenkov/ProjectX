@@ -95,7 +95,7 @@ void MainWindow::processHandler()
 
     TVector polVec;
 
-    polVec.Set(ui->aSpinBox->value()*M_PI/180, ui->fiSphinBox->value()*M_PI/180, 1000);
+    polVec.Set(ui->aSpinBox->value()*M_PI/180, ui->fiSphinBox->value()*M_PI/180, 1);
 
     m_algo->SetSightVector(polVec);
     m_view.GetModelScene()->setDrawNormal(true);

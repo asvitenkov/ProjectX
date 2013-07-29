@@ -22,7 +22,6 @@ public:
     double Wavelength();
     double ZenithAngle();
     double AzimuthAngle();
-    double PhiNab();
     TComplex E1();
     TComplex M1();
     EConduction::TYPE Material();
@@ -45,6 +44,7 @@ private:
 
 protected slots:
     void OnBtnCalculate();
+    void OnBtnClearLog();
 };
 
 #endif // CALCULATEDIALOG_H
