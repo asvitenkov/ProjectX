@@ -44,7 +44,6 @@ HEADERS += mainwindow.h \
             Model/ModelView.h \
             Model/ModelScene.h \
             Algo/Algoritm.h \
-            Calc/ComputeFieldDll.hpp \
             Calc/IComputeField.hpp \
             Calc/BaseComputeField.hpp \
             calculatedialog.h \

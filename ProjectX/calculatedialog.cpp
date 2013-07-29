@@ -55,6 +55,7 @@ void CalculateDialog::InitDialog()
     SetMaterial(EConduction::Metal);
 
     connect(ui->btnCalculate,SIGNAL(clicked()),this,SLOT(OnBtnCalculate()));
+    connect(ui->btnClear,SIGNAL(clicked()),this,SLOT(OnBtnClearLog()));
 
 
 
@@ -122,6 +123,10 @@ void CalculateDialog::OnBtnCalculate()
 {
     // Process calculate
 
+
+    QCursor curs = cursor();
+    setCursor(Qt::WaitCursor);
+
     QVector<TriangleShared> triangles =  mModelView->GetModelScene()->GetModel()->GetTriangles();
     BaseComputeField<double> compute;
 
@@ -182,6 +187,9 @@ void CalculateDialog::OnBtnCalculate()
         Print("");
 
     }
+
+
+    setCursor(curs);
 
 }
 
